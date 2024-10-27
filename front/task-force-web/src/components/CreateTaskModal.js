@@ -7,11 +7,12 @@ import { createTask } from '../services/api';
 const CreateTaskModal = ({ showModal, handleClose }) => {
   const [taskTitle, setTaskTitle] = useState('');
   const [taskDescription, setTaskDescription] = useState('');
+  const [priority, setPriority] = useState('medium');
 
   const handleCreateTask = () => {
     // Здесь будет логика создания задачи, например, вызов API
     console.log('Task Created:', { taskTitle, taskDescription });
-    createTask({ title: taskTitle, description: taskDescription, status: "to_do" })
+    createTask({ title: taskTitle, description: taskDescription, priority, status: "to_do" })
     
     // Очистка полей
     setTaskTitle('');
@@ -49,6 +50,14 @@ const CreateTaskModal = ({ showModal, handleClose }) => {
               onChange={(e) => setTaskDescription(e.target.value)}
               required
             />
+            <label for="priority-select">Приоритет</label>
+            <select class="form-select" id="priority-select" value={priority} onChange={(e) => setPriority(e.target.value)}>
+              <option value="very high">Very High</option>
+              <option value="high">High</option>
+              <option value="medium">Medium</option>
+              <option value="low">Low</option>
+              <option value="lowest">Lowest</option>
+            </select>
           </div>
         </form>
       </Modal.Body>

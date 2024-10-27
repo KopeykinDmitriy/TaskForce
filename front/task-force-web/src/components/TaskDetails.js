@@ -1,56 +1,123 @@
+// src/components/TaskDetails.js
+
 import React, { useState, useEffect } from 'react';
+import { Card, Button, Form, Row, Col, Dropdown } from 'react-bootstrap';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchTaskById, updateTask } from '../services/api'; // Методы для получения и обновления задачи
+import { fetchTaskById, updateTask } from '../services/api';
 
 const TaskDetails = () => {
-  const { taskId } = useParams(); // Получаем ID задачи из URL
-  const navigate = useNavigate();
+  const { taskId } = useParams();
   const [task, setTask] = useState(null);
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [status, setStatus] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  const [updatedTitle, setUpdatedTitle] = useState('');
+  const [updatedDescription, setUpdatedDescription] = useState('');
+  const [updatedStatus, setUpdatedStatus] = useState(''); // Новый статус задачи
+  const navigate = useNavigate();
 
   useEffect(() => {
     const getTask = async () => {
-      const fetchedTask = await fetchTaskById(taskId);
-      setTask(fetchedTask);
-      setTitle(fetchedTask.title);
-      setDescription(fetchedTask.description);
-      setStatus(fetchedTask.status)
+      const data = await fetchTaskById(taskId);
+      setTask(data);
+      setUpdatedTitle(data.title);
+      setUpdatedDescription(data.description);
+      setUpdatedStatus(data.status); // Установить текущий статус
     };
-
     getTask();
   }, [taskId]);
 
-  const handleSave = async () => {
-    await updateTask(taskId, { title, description, status });
-    navigate('/'); // Возвращаемся на главную страницу
+  const handleUpdate = async () => {
+    const updatedTask = {
+      ...task,
+      title: updatedTitle,
+      description: updatedDescription,
+      status: updatedStatus, // Сохранение нового статуса
+    };
+    await updateTask(taskId, updatedTask);
+    setTask(updatedTask);
+    setIsEditing(false);
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+    setUpdatedTitle(task.title);
+    setUpdatedDescription(task.description);
+    setUpdatedStatus(task.status); // Вернуть старый статус при отмене
   };
 
   if (!task) {
-    return <p>Загрузка...</p>;
+    return <div>Загрузка...</div>;
   }
 
   return (
-    <div className="task-details">
-      <h2>Редактирование задачи</h2>
-      <input
-        type="text"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        placeholder="Название задачи"
-      />
-      <textarea
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-        placeholder="Описание задачи"
-      />
-      <textarea
-        value={status}
-        onChange={(e) => setStatus(e.target.value)}
-        placeholder="Статус задачи"
-      />
-      <button onClick={handleSave}>Сохранить изменения</button>
+    <div className="container mt-5">
+      <Row>
+        <Col md={{ span: 8, offset: 2 }}>
+          <Card className="shadow-lg">
+            <Card.Body>
+              <Card.Title className="text-center">
+                {isEditing ? (
+                  <Form.Control 
+                    type="text" 
+                    value={updatedTitle} 
+                    onChange={(e) => setUpdatedTitle(e.target.value)} 
+                  />
+                ) : (
+                  <h2>{task.title}</h2>
+                )}
+              </Card.Title>
+              <Card.Text>
+                {isEditing ? (
+                  <Form.Control 
+                    as="textarea" 
+                    rows={5} 
+                    value={updatedDescription} 
+                    onChange={(e) => setUpdatedDescription(e.target.value)} 
+                  />
+                ) : (
+                  <p>{task.description}</p>
+                )}
+              </Card.Text>
+
+              <div className="mb-4">
+                <h5>Статус задачи:</h5>
+                {isEditing ? (
+                  <Form.Select
+                    value={updatedStatus}
+                    onChange={(e) => setUpdatedStatus(e.target.value)}
+                  >
+                    <option value="to_do">To Do</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="done">Done</option>
+                  </Form.Select>
+                ) : (
+                  <p>{task.status}</p>
+                )}
+              </div>
+
+              <div className="d-flex justify-content-between">
+                {isEditing ? (
+                  <>
+                    <Button variant="primary" onClick={handleUpdate}>
+                      Сохранить изменения
+                    </Button>
+                    <Button variant="secondary" onClick={handleCancel}>
+                      Отменить
+                    </Button>
+                  </>
+                ) : (
+                  <Button variant="primary" onClick={() => setIsEditing(true)}>
+                    Редактировать
+                  </Button>
+                )}
+
+                <Button variant="secondary" onClick={() => navigate(-1)}>
+                  Назад
+                </Button>
+              </div>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
     </div>
   );
 };
