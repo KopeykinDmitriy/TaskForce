@@ -1,0 +1,186 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\CsharpProject\\TaskForce\\back\\DatabaseService\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{32C1BA4C-CED0-4190-A8F5-110A19D81EBC}|DatabaseService.csproj|c:\\csharpproject\\taskforce\\back\\databaseservice\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{32C1BA4C-CED0-4190-A8F5-110A19D81EBC}|DatabaseService.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{32C1BA4C-CED0-4190-A8F5-110A19D81EBC}|DatabaseService.csproj|c:\\csharpproject\\taskforce\\back\\databaseservice\\data\\databasecontext\\databasecontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{32C1BA4C-CED0-4190-A8F5-110A19D81EBC}|DatabaseService.csproj|solutionrelative:data\\databasecontext\\databasecontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{32C1BA4C-CED0-4190-A8F5-110A19D81EBC}|DatabaseService.csproj|c:\\csharpproject\\taskforce\\back\\databaseservice\\databaseservice.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{32C1BA4C-CED0-4190-A8F5-110A19D81EBC}|DatabaseService.csproj|solutionrelative:databaseservice.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{32C1BA4C-CED0-4190-A8F5-110A19D81EBC}|DatabaseService.csproj|c:\\csharpproject\\taskforce\\back\\databaseservice\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{32C1BA4C-CED0-4190-A8F5-110A19D81EBC}|DatabaseService.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{32C1BA4C-CED0-4190-A8F5-110A19D81EBC}|DatabaseService.csproj|c:\\csharpproject\\taskforce\\back\\databaseservice\\data\\entities\\project.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{32C1BA4C-CED0-4190-A8F5-110A19D81EBC}|DatabaseService.csproj|solutionrelative:data\\entities\\project.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{32C1BA4C-CED0-4190-A8F5-110A19D81EBC}|DatabaseService.csproj|c:\\csharpproject\\taskforce\\back\\databaseservice\\repositories\\userrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{32C1BA4C-CED0-4190-A8F5-110A19D81EBC}|DatabaseService.csproj|solutionrelative:repositories\\userrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{32C1BA4C-CED0-4190-A8F5-110A19D81EBC}|DatabaseService.csproj|c:\\csharpproject\\taskforce\\back\\databaseservice\\controllers\\datacontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{32C1BA4C-CED0-4190-A8F5-110A19D81EBC}|DatabaseService.csproj|solutionrelative:controllers\\datacontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{32C1BA4C-CED0-4190-A8F5-110A19D81EBC}|DatabaseService.csproj|c:\\csharpproject\\taskforce\\back\\databaseservice\\data\\entities\\users.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{32C1BA4C-CED0-4190-A8F5-110A19D81EBC}|DatabaseService.csproj|solutionrelative:data\\entities\\users.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{32C1BA4C-CED0-4190-A8F5-110A19D81EBC}|DatabaseService.csproj|c:\\csharpproject\\taskforce\\back\\databaseservice\\services\\userservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{32C1BA4C-CED0-4190-A8F5-110A19D81EBC}|DatabaseService.csproj|solutionrelative:services\\userservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{32C1BA4C-CED0-4190-A8F5-110A19D81EBC}|DatabaseService.csproj|c:\\csharpproject\\taskforce\\back\\databaseservice\\data\\entities\\userproject.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{32C1BA4C-CED0-4190-A8F5-110A19D81EBC}|DatabaseService.csproj|solutionrelative:data\\entities\\userproject.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 5,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "DataController.cs",
+              "DocumentMoniker": "C:\\CsharpProject\\TaskForce\\back\\DatabaseService\\Controllers\\DataController.cs",
+              "RelativeDocumentMoniker": "Controllers\\DataController.cs",
+              "ToolTip": "C:\\CsharpProject\\TaskForce\\back\\DatabaseService\\Controllers\\DataController.cs",
+              "RelativeToolTip": "Controllers\\DataController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABoAAABFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-03T17:56:44.095Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Users.cs",
+              "DocumentMoniker": "C:\\CsharpProject\\TaskForce\\back\\DatabaseService\\Data\\Entities\\Users.cs",
+              "RelativeDocumentMoniker": "Data\\Entities\\Users.cs",
+              "ToolTip": "C:\\CsharpProject\\TaskForce\\back\\DatabaseService\\Data\\Entities\\Users.cs",
+              "RelativeToolTip": "Data\\Entities\\Users.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAUAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-03T14:49:39.696Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "UserService.cs",
+              "DocumentMoniker": "C:\\CsharpProject\\TaskForce\\back\\DatabaseService\\Services\\UserService.cs",
+              "RelativeDocumentMoniker": "Services\\UserService.cs",
+              "ToolTip": "C:\\CsharpProject\\TaskForce\\back\\DatabaseService\\Services\\UserService.cs",
+              "RelativeToolTip": "Services\\UserService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAAAbAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-03T17:47:36.832Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "UserProject.cs",
+              "DocumentMoniker": "C:\\CsharpProject\\TaskForce\\back\\DatabaseService\\Data\\Entities\\UserProject.cs",
+              "RelativeDocumentMoniker": "Data\\Entities\\UserProject.cs",
+              "ToolTip": "C:\\CsharpProject\\TaskForce\\back\\DatabaseService\\Data\\Entities\\UserProject.cs",
+              "RelativeToolTip": "Data\\Entities\\UserProject.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAmAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-03T17:09:48.401Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "DatabaseContext.cs",
+              "DocumentMoniker": "C:\\CsharpProject\\TaskForce\\back\\DatabaseService\\Data\\DatabaseContext\\DatabaseContext.cs",
+              "RelativeDocumentMoniker": "Data\\DatabaseContext\\DatabaseContext.cs",
+              "ToolTip": "C:\\CsharpProject\\TaskForce\\back\\DatabaseService\\Data\\DatabaseContext\\DatabaseContext.cs",
+              "RelativeToolTip": "Data\\DatabaseContext\\DatabaseContext.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAABUAAAAnAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-03T14:41:27.828Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\CsharpProject\\TaskForce\\back\\DatabaseService\\appsettings.json",
+              "RelativeDocumentMoniker": "appsettings.json",
+              "ToolTip": "C:\\CsharpProject\\TaskForce\\back\\DatabaseService\\appsettings.json",
+              "RelativeToolTip": "appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2024-12-03T16:56:41.411Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "UserRepository.cs",
+              "DocumentMoniker": "C:\\CsharpProject\\TaskForce\\back\\DatabaseService\\Repositories\\UserRepository.cs",
+              "RelativeDocumentMoniker": "Repositories\\UserRepository.cs",
+              "ToolTip": "C:\\CsharpProject\\TaskForce\\back\\DatabaseService\\Repositories\\UserRepository.cs",
+              "RelativeToolTip": "Repositories\\UserRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAqwAoAAAA2AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-03T17:45:50.891Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "DatabaseService.csproj",
+              "DocumentMoniker": "C:\\CsharpProject\\TaskForce\\back\\DatabaseService\\DatabaseService.csproj",
+              "RelativeDocumentMoniker": "DatabaseService.csproj",
+              "ToolTip": "C:\\CsharpProject\\TaskForce\\back\\DatabaseService\\DatabaseService.csproj",
+              "RelativeToolTip": "DatabaseService.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2024-12-03T16:55:58.206Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Project.cs",
+              "DocumentMoniker": "C:\\CsharpProject\\TaskForce\\back\\DatabaseService\\Data\\Entities\\Project.cs",
+              "RelativeDocumentMoniker": "Data\\Entities\\Project.cs",
+              "ToolTip": "C:\\CsharpProject\\TaskForce\\back\\DatabaseService\\Data\\Entities\\Project.cs",
+              "RelativeToolTip": "Data\\Entities\\Project.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-03T14:49:38.659Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\CsharpProject\\TaskForce\\back\\DatabaseService\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "C:\\CsharpProject\\TaskForce\\back\\DatabaseService\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-03T14:42:00.719Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

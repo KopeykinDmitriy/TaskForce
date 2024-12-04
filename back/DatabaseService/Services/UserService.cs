@@ -22,8 +22,10 @@ namespace DatabaseService.Services
         {
             var user = new User
             {
-                Name = userDto.Name,
-                Email = userDto.Email
+                name = userDto.Name,
+                surname = userDto.Surname,
+                email = userDto.Email,
+                password = userDto.Password
             };
             return await _repository.AddUserAsync(user);
         }

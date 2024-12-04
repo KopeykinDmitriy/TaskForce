@@ -24,6 +24,6 @@ public class DataController : ControllerBase
     public async Task<IActionResult> AddUser(UserDto userDto)
     {
         var user = await _userService.AddUserAsync(userDto);
-        return CreatedAtAction(nameof(GetAllUsers), new { id = user.Id }, user);
+        return CreatedAtAction(nameof(GetAllUsers), new { id = user.id }, user);
     }
 }
