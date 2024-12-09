@@ -16,4 +16,12 @@ public class TasksRepository : ITasksRepository
     {
         return _tasks.FirstOrDefault(t => t.Id == id) ?? throw new InvalidOperationException();
     }
+    public void Update(int id, TaskModel updatedTask)
+    {
+        var taskIndex = _tasks.FindIndex(t => t.Id == id);
+        if (taskIndex == -1)
+            throw new InvalidOperationException("Task not found");
+
+        _tasks[taskIndex] = updatedTask; // Замена существующей задачи
+    }
 }
