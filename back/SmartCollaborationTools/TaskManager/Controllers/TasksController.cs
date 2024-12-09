@@ -17,19 +17,22 @@ public class TasksController : ControllerBase
         _taskChangesLogger = taskChangesLogger;
     }
 
-    [HttpGet("{taskId}", Name = "GetTask")]
-    public TaskModel Get(int taskId)
+    [HttpGet("GetTask/{taskId}")]
+    public IActionResult Get(int taskId)
     {
-        return _tasksRepository.Get(taskId);
+        var task = _tasksRepository.Get(taskId);
+        if (task == null) 
+            return NotFound();
+        return Ok(task);
     }
 
-    [HttpPost(Name = "AddTask")]
+    [HttpPost("AddTask")]
     public void Add(TaskModel task)
     {
         _tasksRepository.Add(task);
     }
 
-    [HttpPut("{taskId}", Name = "UpdateTask")]
+    [HttpPost("UpdateTask/{taskId}")]
     public IActionResult Update(int taskId, TaskModel updatedTask)
     {
         var originalTask = _tasksRepository.Get(taskId);
@@ -46,7 +49,7 @@ public class TasksController : ControllerBase
         return Ok(new { message = "Task updated successfully" });
     }
 
-    [HttpGet("{taskId}/history", Name = "GetTaskHistory")]
+    [HttpGet("GetTaskHistory/{taskId}")]
     public IActionResult GetHistory(int taskId)
     {
         var task = _tasksRepository.Get(taskId);
@@ -55,5 +58,11 @@ public class TasksController : ControllerBase
             return NotFound();
 
         return Ok(task.History);
+    }
+    
+    [HttpGet("GetAllTasks")]
+    public IActionResult GetAllTasks()
+    {
+        return Ok(_tasksRepository.GetAll());
     }
 }

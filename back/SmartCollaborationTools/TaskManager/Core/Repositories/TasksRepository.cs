@@ -23,6 +23,10 @@ public class TasksRepository : ITasksRepository
         if (taskIndex == -1)
             throw new InvalidOperationException("Task not found");
 
-        _tasks[taskIndex] = updatedTask; // Замена существующей задачи
+        _tasks[taskIndex] = updatedTask; 
+    }
+    public List<TaskModel> GetAll()
+    {
+        return _tasks;
     }
 }
