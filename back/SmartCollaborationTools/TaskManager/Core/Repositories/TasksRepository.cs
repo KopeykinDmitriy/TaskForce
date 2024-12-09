@@ -11,11 +11,12 @@ public class TasksRepository : ITasksRepository
     {
         _tasks.Add(task);
     }
-
-    public TaskModel Get(int id)
+    
+    public TaskModel? Get(int id)
     {
-        return _tasks.FirstOrDefault(t => t.Id == id) ?? throw new InvalidOperationException();
+        return _tasks.FirstOrDefault(t => t.Id == id);
     }
+    
     public void Update(int id, TaskModel updatedTask)
     {
         var taskIndex = _tasks.FindIndex(t => t.Id == id);

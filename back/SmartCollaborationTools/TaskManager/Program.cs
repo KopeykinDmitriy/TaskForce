@@ -1,3 +1,5 @@
+using TaskManager.Core.History;
+using TaskManager.Core.Interfaces.History;
 using TaskManager.Core.Interfaces.Repositories;
 using TaskManager.Core.Repositories;
 
@@ -11,6 +13,7 @@ public class Program
 
         // Add services to the container.
         builder.Services.AddSingleton<ITasksRepository, TasksRepository>();
+        builder.Services.AddSingleton<ITaskChangesLogger, TaskChangesLogger>();
         builder.Services.AddControllers();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
