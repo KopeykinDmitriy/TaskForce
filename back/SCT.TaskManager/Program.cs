@@ -1,7 +1,7 @@
-using TaskManager.Core.Interfaces.Repositories;
-using TaskManager.Core.Repositories;
+using SCT.TaskManager.Core.Interfaces.Repositories;
+using SCT.TaskManager.Core.Repositories;
 
-namespace TaskManager;
+namespace SCT.TaskManager;
 
 public class Program
 {

@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using TaskManager.Core.Interfaces.Repositories;
-using TaskManager.Models;
+using SCT.TaskManager.Core.Interfaces.Repositories;
+using SCT.TaskManager.Models;
 
-namespace TaskManager.Controllers;
+namespace SCT.TaskManager.Controllers;
 
 [ApiController]
 [Route("[controller]")]
