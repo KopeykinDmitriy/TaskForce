@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import '../styles/TaskCard.css'
 
 const priorityColors = {
   'very high': '#f00',
@@ -40,8 +41,8 @@ const TaskCard = ({ task }) => {
         />
         <h5 class="card-title text-truncate-2">{task.title}</h5>
         <div>
-          <div className="task-hashtags" style={{'margin-bottom': '3px'}}>
-            {task.hashtags.slice(0, 6).map((tag, index) => (
+          <div class="task-hashtags" style={{'margin-bottom': '3px'}}>
+            {task.tags.slice(0, 6).map((tag, index) => (
               <span key={index} className="badge bg-secondary mx-1 my-1 rounded-pill">
                 {tag}
               </span>

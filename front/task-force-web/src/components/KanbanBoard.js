@@ -3,6 +3,7 @@ import { fetchTasks } from '../services/api'; // Подключаем метод
 import TaskCard from './TaskCard';
 import { Link } from 'react-router-dom';
 import CreateTaskModal from './CreateTaskModal';
+import '../styles/Kanban.css'
 
 const KanbanBoard = () => {
   const [tasks, setTasks] = useState([]);
