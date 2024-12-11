@@ -1,7 +1,7 @@
-using TaskManager.Core.Interfaces.Repositories;
-using TaskManager.Models;
+using SCT.TaskManager.Core.Interfaces.Repositories;
+using SCT.TaskManager.Models;
 
-namespace TaskManager.Core.Repositories;
+namespace SCT.TaskManager.Core.Repositories;
 
 public class TasksRepository : ITasksRepository
 {

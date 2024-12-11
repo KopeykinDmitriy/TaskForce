@@ -1,4 +1,4 @@
-namespace TaskManager.Models;
+namespace SCT.TaskManager.Models;
 
 public class TaskModel
 {

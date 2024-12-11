@@ -1,25 +1,24 @@
-using TaskManager.Core.History;
-using TaskManager.Core.Interfaces.History;
-using TaskManager.Core.Interfaces.Repositories;
-using TaskManager.Core.Repositories;
+using SCT.TaskManager.Core.Interfaces.Repositories;
+using SCT.TaskManager.Core.Repositories;
 
-namespace TaskManager;
+namespace SCT.TaskManager;
 
 public class Program
 {
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-        
+
+        // Add services to the container.
         builder.Services.AddSingleton<ITasksRepository, TasksRepository>();
-        builder.Services.AddSingleton<ITaskChangesLogger, TaskChangesLogger>();
-        builder.Services.AddSingleton<IProjectsRepository, ProjectsRepository>();
         builder.Services.AddControllers();
+        // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
 
         var app = builder.Build();
-        
+
+        // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
