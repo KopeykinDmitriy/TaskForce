@@ -6,7 +6,7 @@ using SCT.Users.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<DatabaseContext>(options =>
-                                                   options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))); // Настройка подключения к базе данных PostgreSQL
+                                                   options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("Project.Presentation"))); // Настройка подключения к базе данных PostgreSQL
 builder.Services.AddScoped<UserRepository>(); // Регистрация репозитория
 builder.Services.AddScoped<UserService>();    // Регистрация сервиса
 builder.Services.AddControllers();

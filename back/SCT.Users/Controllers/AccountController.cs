@@ -93,6 +93,7 @@ namespace SCT.Users.Controllers
         }
 
 
+        [AllowAnonymous]
         [HttpPost("Logout")]
         public IActionResult Logout()
         {
