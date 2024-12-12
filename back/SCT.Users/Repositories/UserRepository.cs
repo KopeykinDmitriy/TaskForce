@@ -1,16 +1,19 @@
 using Microsoft.EntityFrameworkCore;
 using SCT.Common.Data.DatabaseContext;
 using SCT.Common.Data.Entities;
+using SCT.Users.Providers;
 
 namespace SCT.Users.Repositories
 {
     public class UserRepository
     {
         private readonly DatabaseContext _context;
+        private readonly IUsernameProvider _usernameProvider; // todo Это просто пример использования, надо будет выпилить.
 
-        public UserRepository(DatabaseContext context)
+        public UserRepository(DatabaseContext context, IUsernameProvider usernameProvider)
         {
             _context = context;
+            _usernameProvider = usernameProvider;
         }
 
         public async Task<List<User>> GetAllUsersAsync()
