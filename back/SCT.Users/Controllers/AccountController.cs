@@ -1,11 +1,16 @@
-﻿using System.Net.Http.Headers;
-using System.Text;
-using System.Text.Json;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 
 namespace SCT.Users.Controllers
 {
@@ -27,23 +32,61 @@ namespace SCT.Users.Controllers
         [HttpPost("Register")]
         public async Task<IActionResult> RegisterUser(string login, string email, string password)
         {
-            // Получаем настройки из конфигурации
-            var keycloakBaseUrl = _configuration["Authentication:Authority"];
-            var realm = _configuration["Authentication:Realm"];
-            var clientId = _configuration["Authentication:ClientId"];
-            var clientSecret = _configuration["Authentication:ClientSecret"];
-
-            Console.WriteLine($"Response Status: {response.StatusCode}");
-            // Получаем токен администратора для взаимодействия с Keycloak Admin API
-            var tokenResponse = await GetAdminAccessToken(keycloakBaseUrl, clientId, clientSecret);
+            var tokenResponse = await GetAdminAccessToken();
             if (tokenResponse == null || string.IsNullOrEmpty(tokenResponse.AccessToken))
             {
                 return StatusCode(500, "Не удалось получить токен администратора Keycloak.");
             }
 
-            // Создание нового пользователя через Keycloak Admin API
+            var createUserResult = await CreateUserInKeycloak(tokenResponse.AccessToken, login, email, password);
+
+            if (createUserResult.IsSuccess)
+            {
+                return Ok("Пользователь успешно зарегистрирован.");
+            }
+
+            return StatusCode((int)createUserResult.StatusCode, createUserResult.ErrorResponse);
+        }
+
+        private async Task<TokenResponse?> GetAdminAccessToken()
+        {
+            var keycloakUrl = _configuration["Authentication:Authority"];
+            var clientId = _configuration["Authentication:ClientId"];
+            var clientSecret = _configuration["Authentication:ClientSecret"];
+            var username = _configuration["Authentication:Name"];
+            var password = _configuration["Authentication:Password"];
+
             var httpClient = _httpClientFactory.CreateClient();
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenResponse.AccessToken);
+
+            var tokenRequest = new FormUrlEncodedContent(new[]
+            {
+                new KeyValuePair<string, string>("grant_type", "password"),
+                new KeyValuePair<string, string>("client_id", clientId),
+                new KeyValuePair<string, string>("client_secret", clientSecret),
+                new KeyValuePair<string, string>("username", username),
+                new KeyValuePair<string, string>("password", password)
+            });
+
+            var response = await httpClient.PostAsync($"{keycloakUrl.TrimEnd('/')}/protocol/openid-connect/token", tokenRequest);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Ошибка при получении токена: {error}");
+                return null;
+            }
+
+            var content = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<TokenResponse>(content);
+        }
+
+        private async Task<(bool IsSuccess, HttpStatusCode StatusCode, string? ErrorResponse)> CreateUserInKeycloak(string accessToken, string login, string email, string password)
+        {
+            var keycloakAdminUrl = _configuration["Authentication:AuthorityAdmin"];
+            var realm = _configuration["Authentication:Realm"];
+
+            var httpClient = _httpClientFactory.CreateClient();
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
             var createUserPayload = new
             {
@@ -52,46 +95,26 @@ namespace SCT.Users.Controllers
                 enabled = true,
                 credentials = new[]
                 {
-                new
+                    new
                     {
                         type = "password",
                         value = password,
                         temporary = false
                     }
-                }   
+                }
             };
 
             var response = await httpClient.PostAsync(
-                $"{keycloakBaseUrl}/admin/realms/{realm}/users",
+                $"{keycloakAdminUrl.TrimEnd('/')}/{realm}/users", 
                 new StringContent(JsonSerializer.Serialize(createUserPayload), Encoding.UTF8, "application/json"));
 
             if (response.IsSuccessStatusCode)
             {
-                return Ok("Пользователь успешно зарегистрирован.");
+                return (true, response.StatusCode, null);
             }
 
             var errorResponse = await response.Content.ReadAsStringAsync();
-            return StatusCode((int)response.StatusCode, errorResponse);
-        }
-
-        private async Task<TokenResponse?> GetAdminAccessToken(string keycloakUrl, string clientId, string clientSecret)
-        {
-            var httpClient = _httpClientFactory.CreateClient();
-            var tokenRequest = new FormUrlEncodedContent(new[]
-            {
-                new KeyValuePair<string, string>("grant_type", "client_credentials"),
-                new KeyValuePair<string, string>("client_id", clientId),
-                new KeyValuePair<string, string>("client_secret", clientSecret)
-            });
-
-            var uri = new Uri($"{keycloakUrl}/protocol/openid-connect/token"); // Абсолютный URI
-
-            var response = await httpClient.PostAsync(uri, tokenRequest);
-
-            if (!response.IsSuccessStatusCode) return null;
-
-            var content = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<TokenResponse>(content);
+            return (false, response.StatusCode, errorResponse);
         }
 
 
@@ -123,8 +146,16 @@ namespace SCT.Users.Controllers
 
         public class TokenResponse
         {
+            [JsonPropertyName("access_token")]
             public string AccessToken { get; set; }
+
+            [JsonPropertyName("expires_in")]
+            public int ExpiresIn { get; set; }
+
+            [JsonPropertyName("refresh_token")]
+            public string RefreshToken { get; set; }
         }
+
 
         [HttpGet("HelloWorld")]
         public string GetString()
@@ -133,3 +164,5 @@ namespace SCT.Users.Controllers
         }
     }
 }
+
+
