@@ -27,19 +27,19 @@ namespace SCT.Users.Controllers
         [HttpPost("Register")]
         public async Task<IActionResult> RegisterUser(string login, string email, string password)
         {
-            // URL для API Keycloak
-            var keycloakBaseUrl = _configuration["Keycloak:AuthServerUrl"];
-            var realm = _configuration["Keycloak:Realm"];
-            var adminClientId = _configuration["Keycloak:AdminClientId"];
-            var adminClientSecret = _configuration["Keycloak:AdminClientSecret"];
+            // Получаем настройки из конфигурации
+            var keycloakBaseUrl = _configuration["Authentication:Authority"];
+            var realm = _configuration["Authentication:Realm"];
+            var clientId = _configuration["Authentication:ClientId"];
+            var clientSecret = _configuration["Authentication:ClientSecret"];
 
-            // Получение admin access token
-            var tokenResponse = await GetAdminAccessToken(keycloakBaseUrl, adminClientId, adminClientSecret);
+            Console.WriteLine($"Response Status: {response.StatusCode}");
+            // Получаем токен администратора для взаимодействия с Keycloak Admin API
+            var tokenResponse = await GetAdminAccessToken(keycloakBaseUrl, clientId, clientSecret);
             if (tokenResponse == null || string.IsNullOrEmpty(tokenResponse.AccessToken))
             {
                 return StatusCode(500, "Не удалось получить токен администратора Keycloak.");
             }
-
 
             // Создание нового пользователя через Keycloak Admin API
             var httpClient = _httpClientFactory.CreateClient();
@@ -58,7 +58,7 @@ namespace SCT.Users.Controllers
                         value = password,
                         temporary = false
                     }
-                }
+                }   
             };
 
             var response = await httpClient.PostAsync(
@@ -79,12 +79,14 @@ namespace SCT.Users.Controllers
             var httpClient = _httpClientFactory.CreateClient();
             var tokenRequest = new FormUrlEncodedContent(new[]
             {
-            new KeyValuePair<string, string>("grant_type", "client_credentials"),
-            new KeyValuePair<string, string>("client_id", clientId),
-            new KeyValuePair<string, string>("client_secret", clientSecret)
-        });
+                new KeyValuePair<string, string>("grant_type", "client_credentials"),
+                new KeyValuePair<string, string>("client_id", clientId),
+                new KeyValuePair<string, string>("client_secret", clientSecret)
+            });
 
-            var response = await httpClient.PostAsync($"{keycloakUrl}/protocol/openid-connect/token", tokenRequest);
+            var uri = new Uri($"{keycloakUrl}/protocol/openid-connect/token"); // Абсолютный URI
+
+            var response = await httpClient.PostAsync(uri, tokenRequest);
 
             if (!response.IsSuccessStatusCode) return null;
 
@@ -121,7 +123,7 @@ namespace SCT.Users.Controllers
 
         public class TokenResponse
         {
-            public string? AccessToken { get; set; }
+            public string AccessToken { get; set; }
         }
 
         [HttpGet("HelloWorld")]

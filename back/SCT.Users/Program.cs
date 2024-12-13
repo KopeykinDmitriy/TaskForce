@@ -1,5 +1,8 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using SCT.Common.Data.DatabaseContext;
 using SCT.Users.Providers;
 using SCT.Users.Repositories;
@@ -8,26 +11,38 @@ using SCT.Users.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<DatabaseContext>(options =>
-                                                   options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("SCT.Users")), ServiceLifetime.Singleton, ServiceLifetime.Singleton); // Настройка подключения к базе данных PostgreSQL
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
+    b => b.MigrationsAssembly("SCT.Users")),
+    ServiceLifetime.Singleton,
+    ServiceLifetime.Singleton); // Настройка подключения к базе данных PostgreSQL
+
 builder.Services.AddSingleton<UserRepository>(); // Регистрация репозитория
 builder.Services.AddSingleton<UserService>();    // Регистрация сервиса
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddHttpClient();                // Добавил в DI контейнер, без него ошибки
 builder.Services.AddSingleton<IUsernameProvider, UsernameProvider>();
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add(new Microsoft.AspNetCore.Mvc.Authorization.AuthorizeFilter());
 });
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+// Настройка Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
-        Description = "Введите JWT токен следующим образом: Bearer {токен}",
+        //Description = "Введите JWT токен следующим образом: Bearer {токен}",
+        //Name = "Authorization",
+        //In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        //Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+        //Scheme = "bearer"
         Name = "Authorization",
-        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
-        Scheme = "bearer"
+        Type = SecuritySchemeType.ApiKey,
+        In = ParameterLocation.Header,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        Description = "Please enter the JWT with Bearer keyword"
     });
     c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
     {
@@ -45,19 +60,23 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-builder.Services.AddAuthentication(options =>
-       {
-           options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-           options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-       })
-       .AddJwtBearer(options =>
-       {
-           options.Authority = builder.Configuration["Jwt:Authority"];
-           options.Audience = builder.Configuration["Jwt:Audience"];
-           options.RequireHttpsMetadata = false; // Используйте true для продакшн-среды
-           options.IncludeErrorDetails = true;
-       });
-builder.Services.AddAuthorization();
+
+// Настройка аутентификации и авторизации
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.Authority = builder.Configuration["Authentication:Authority"];
+        options.RequireHttpsMetadata = bool.Parse(builder.Configuration["Authentication:RequireHttpsMetadata"] ?? "false");
+        options.Audience = builder.Configuration["Authentication:Aud"];
+        options.SaveToken = bool.Parse(builder.Configuration["Authentication:SaveToken"] ?? "true");
+    });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.FallbackPolicy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+});
 
 var app = builder.Build();
 
