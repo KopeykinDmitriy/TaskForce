@@ -25,6 +25,7 @@ builder.Services.AddScoped<KeycloakService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient();                // Добавил в DI контейнер, без него ошибки
 builder.Services.AddSingleton<IUsernameProvider, UsernameProvider>();
+builder.Services.AddMemoryCache();
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add(new Microsoft.AspNetCore.Mvc.Authorization.AuthorizeFilter());

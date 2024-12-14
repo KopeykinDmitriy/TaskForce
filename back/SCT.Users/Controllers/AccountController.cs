@@ -24,26 +24,6 @@ namespace SCT.Users.Controllers
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
 
-        //[AllowAnonymous]
-        //[HttpPost("Register")]
-        //public async Task<IActionResult> RegisterUser(string login, string email, string password)
-        //{
-        //    var tokenResponse = await _keycloakService.GetAdminAccessToken();
-        //    if (tokenResponse == null || string.IsNullOrEmpty(tokenResponse.AccessToken))
-        //    {
-        //        return StatusCode(500, "Не удалось получить токен администратора Keycloak.");
-        //    }
-
-        //    var createUserResult = await _keycloakService.CreateUserInKeycloak(tokenResponse.AccessToken, login, email, password);
-
-        //    if (createUserResult.IsSuccess)
-        //    {
-        //        return Ok("Пользователь успешно зарегистрирован.");
-        //    }
-
-        //    return StatusCode((int)createUserResult.StatusCode, createUserResult.ErrorResponse);
-        //}
-
 
         [AllowAnonymous]
         [HttpPost("Register")]
