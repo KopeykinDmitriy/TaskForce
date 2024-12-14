@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using SCT.Common.Data.DatabaseContext;
 using SCT.TaskManager.Core.Interfaces.Repositories;
-using SCT.TaskManager.Models;
+using SCT.TaskManager.DTO;
 
 namespace SCT.TaskManager.Controllers;
 
@@ -8,23 +10,49 @@ namespace SCT.TaskManager.Controllers;
 [Route("[controller]")]
 public class TasksController : ControllerBase
 {
-   private readonly ITasksRepository _tasksRepository;
-
-
-    public TasksController(ITasksRepository tasksRepository) 
+    private readonly ITasksRepository _tasksRepository;
+    private readonly DatabaseContext _context;
+    
+    public TasksController(ITasksRepository tasksRepository, DatabaseContext context)
     {
         _tasksRepository = tasksRepository;
+        _context = context;
     }
 
-    [HttpGet(Name = "GetTask")]
-    public TaskModel Get(int taskId)
+    [HttpGet("GetTask/{taskId}")]
+    public async Task<IActionResult> GetAsync(int taskId)
     {
-        return _tasksRepository.Get(taskId);
+        var task = await _tasksRepository.GetAsync(taskId);
+        if (task == null) 
+            return NotFound();
+        return Ok(task);
     }
-   
-    [HttpPost(Name = "AddTask")]
-    public void Add(TaskModel task)
+
+    [HttpPost("AddTask")]
+    public async Task AddAsync(TaskDto task)
     {
-        _tasksRepository.Add(task);
+       await _tasksRepository.AddAsync(task);
+    }
+
+    [HttpPost("UpdateTask")]
+    public async Task<IActionResult> UpdateAsync(TaskDto updatedTask)
+    {
+        // Обновляем задачу
+        await _tasksRepository.UpdateAsync(updatedTask);
+
+        return Ok(new { message = "Task updated successfully" });
+    }
+    
+    [HttpGet("GetAllTasksByProject")]
+    public async Task<IActionResult> GetAllTasksByProjectAsync(int projectId)
+    {   
+        return Ok(await _tasksRepository.GetAllAsync(projectId));
+    }
+
+    [HttpGet("GetAllTags")]
+    public async Task<List<string>> GetAllTagsAsync()
+    {
+        return await _context.Tags.Select(t => t.Name).ToListAsync();
     }
 }
+

@@ -1,11 +1,12 @@
-using SCT.TaskManager.Models;
+using SCT.Common.Data.Entities;
+using SCT.TaskManager.DTO;
 
 namespace SCT.TaskManager.Core.Interfaces.Repositories;
 
 public interface ITasksRepository
 {
-    void Add(TaskModel task);
-    TaskModel? Get(int id);
-    void Update(int id, TaskModel updatedTask);
-    List<TaskModel> GetAll();
+    Task AddAsync(TaskDto task);
+    Task<TaskDto?> GetAsync(int id);
+    Task UpdateAsync(TaskDto updatedTask);
+    Task<List<TaskDto>> GetAllAsync(int projectId);
 }

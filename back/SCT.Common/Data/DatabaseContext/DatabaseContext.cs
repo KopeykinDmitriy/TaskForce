@@ -17,7 +17,7 @@ namespace SCT.Common.Data.DatabaseContext
         public DbSet<UserTags> UserTags { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
+        { 
             base.OnModelCreating(modelBuilder); //наследуем базовую логику 
 
             // Определение ключей и связей для Users

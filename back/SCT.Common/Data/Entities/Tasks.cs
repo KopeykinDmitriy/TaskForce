@@ -14,7 +14,7 @@
         // Внешний ключ для связи с проектом
         public int ProjectId { get; set; }
         // Связи
-        public Project Project { get; set; } = null!;
+        public Project Project { get; set; }
 
         public ICollection<TaskRelation> TaskRelations1 { get; set; } = new List<TaskRelation>(); // Как Task1
         public ICollection<TaskRelation> TaskRelations2 { get; set; } = new List<TaskRelation>(); // Как Task2
