@@ -105,15 +105,14 @@ namespace SCT.Users.Controllers
 
             try
             {
-                // Вызов функции добавления тега к пользователю из сервиса
-                await _userService.AddTagToUserAsync(request);
+                var tagList = new List<TagDto> { request };
 
-                // Возвращаем успешный ответ
+                await _userService.AddTagsToUserAsync(tagList);
+
                 return Ok("Tag successfully added to user.");
             }
             catch (Exception ex)
             {
-                // Логируем внутреннее исключение
                 var innerException = ex.InnerException?.Message ?? "No inner exception.";
                 return StatusCode(500, $"Error adding tag to user: {ex.Message}. Inner exception: {innerException}");
             }
