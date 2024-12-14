@@ -10,14 +10,18 @@ using SCT.Users.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Настройка подключения к базе данных PostgreSQL
 builder.Services.AddDbContext<DatabaseContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
-    b => b.MigrationsAssembly("SCT.Users")),
-    ServiceLifetime.Singleton,
-    ServiceLifetime.Singleton); // Настройка подключения к базе данных PostgreSQL
+    options.UseNpgsql(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        b => b.MigrationsAssembly("SCT.Users")
+    ),
+    ServiceLifetime.Scoped
+); 
 
-builder.Services.AddSingleton<UserRepository>(); // Регистрация репозитория
-builder.Services.AddSingleton<UserService>();    // Регистрация сервиса
+builder.Services.AddScoped<UserRepository>(); // Регистрация репозитория
+builder.Services.AddScoped<UserService>();    // Регистрация сервиса
+builder.Services.AddScoped<KeycloakService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient();                // Добавил в DI контейнер, без него ошибки
 builder.Services.AddSingleton<IUsernameProvider, UsernameProvider>();

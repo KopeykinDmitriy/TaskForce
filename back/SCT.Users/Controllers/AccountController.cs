@@ -3,14 +3,10 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using SCT.Users.Services;
+using SCT.Users.DTOs;
+using SCT.Users.Repositories;
 
 namespace SCT.Users.Controllers
 {
@@ -19,102 +15,75 @@ namespace SCT.Users.Controllers
     [Route("api/[controller]")]
     public class AccountController : Controller
     {
-        private readonly IHttpClientFactory _httpClientFactory;
-        private readonly IConfiguration _configuration;
+        private readonly KeycloakService _keycloakService;
+        private readonly UserService _userService;
 
-        public AccountController(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+        public AccountController(KeycloakService keycloakService, UserService userService)
         {
-            _httpClientFactory = httpClientFactory;
-            _configuration = configuration;
+            _keycloakService = keycloakService ?? throw new ArgumentNullException(nameof(keycloakService));
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
+
+        //[AllowAnonymous]
+        //[HttpPost("Register")]
+        //public async Task<IActionResult> RegisterUser(string login, string email, string password)
+        //{
+        //    var tokenResponse = await _keycloakService.GetAdminAccessToken();
+        //    if (tokenResponse == null || string.IsNullOrEmpty(tokenResponse.AccessToken))
+        //    {
+        //        return StatusCode(500, "Не удалось получить токен администратора Keycloak.");
+        //    }
+
+        //    var createUserResult = await _keycloakService.CreateUserInKeycloak(tokenResponse.AccessToken, login, email, password);
+
+        //    if (createUserResult.IsSuccess)
+        //    {
+        //        return Ok("Пользователь успешно зарегистрирован.");
+        //    }
+
+        //    return StatusCode((int)createUserResult.StatusCode, createUserResult.ErrorResponse);
+        //}
+
 
         [AllowAnonymous]
         [HttpPost("Register")]
         public async Task<IActionResult> RegisterUser(string login, string email, string password)
         {
-            var tokenResponse = await GetAdminAccessToken();
+            // Получение токена администратора Keycloak
+            var tokenResponse = await _keycloakService.GetAdminAccessToken();
             if (tokenResponse == null || string.IsNullOrEmpty(tokenResponse.AccessToken))
             {
                 return StatusCode(500, "Не удалось получить токен администратора Keycloak.");
             }
 
-            var createUserResult = await CreateUserInKeycloak(tokenResponse.AccessToken, login, email, password);
+            // Создание пользователя в Keycloak
+            var createUserResult = await _keycloakService.CreateUserInKeycloak(tokenResponse.AccessToken, login, email, password);
 
             if (createUserResult.IsSuccess)
             {
-                return Ok("Пользователь успешно зарегистрирован.");
-            }
-
-            return StatusCode((int)createUserResult.StatusCode, createUserResult.ErrorResponse);
-        }
-
-        private async Task<TokenResponse?> GetAdminAccessToken()
-        {
-            var keycloakUrl = _configuration["Authentication:Authority"];
-            var clientId = _configuration["Authentication:ClientId"];
-            var clientSecret = _configuration["Authentication:ClientSecret"];
-            var username = _configuration["Authentication:Name"];
-            var password = _configuration["Authentication:Password"];
-
-            var httpClient = _httpClientFactory.CreateClient();
-
-            var tokenRequest = new FormUrlEncodedContent(new[]
-            {
-                new KeyValuePair<string, string>("grant_type", "password"),
-                new KeyValuePair<string, string>("client_id", clientId),
-                new KeyValuePair<string, string>("client_secret", clientSecret),
-                new KeyValuePair<string, string>("username", username),
-                new KeyValuePair<string, string>("password", password)
-            });
-
-            var response = await httpClient.PostAsync($"{keycloakUrl.TrimEnd('/')}/protocol/openid-connect/token", tokenRequest);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                var error = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"Ошибка при получении токена: {error}");
-                return null;
-            }
-
-            var content = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<TokenResponse>(content);
-        }
-
-        private async Task<(bool IsSuccess, HttpStatusCode StatusCode, string? ErrorResponse)> CreateUserInKeycloak(string accessToken, string login, string email, string password)
-        {
-            var keycloakAdminUrl = _configuration["Authentication:AuthorityAdmin"];
-            var realm = _configuration["Authentication:Realm"];
-
-            var httpClient = _httpClientFactory.CreateClient();
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-
-            var createUserPayload = new
-            {
-                username = login,
-                email = email,
-                enabled = true,
-                credentials = new[]
+                try
                 {
-                    new
+                    // Создание пользователя в базе данных
+                    var userDto = new UserDto
                     {
-                        type = "password",
-                        value = password,
-                        temporary = false
-                    }
+                        Name = login,
+                        Email = email,
+                        Password = BCrypt.Net.BCrypt.HashPassword(password) // Хэширование, для получения использовать: BCrypt.Net.BCrypt.Verify(password, hashedPassword)
+                        //Role = "admin" // позже добавить в метод добавление обычного пользователя
+                    };
+
+                    await _userService.AddUserAsync(userDto);
+
+                    return Ok("Пользователь успешно зарегистрирован.");
                 }
-            };
-
-            var response = await httpClient.PostAsync(
-                $"{keycloakAdminUrl.TrimEnd('/')}/{realm}/users", 
-                new StringContent(JsonSerializer.Serialize(createUserPayload), Encoding.UTF8, "application/json"));
-
-            if (response.IsSuccessStatusCode)
-            {
-                return (true, response.StatusCode, null);
+                catch (Exception ex)
+                {
+                    return StatusCode(500, $"Ошибка при добавлении пользователя в базу данных: {ex.Message}");
+                }
             }
 
-            var errorResponse = await response.Content.ReadAsStringAsync();
-            return (false, response.StatusCode, errorResponse);
+            // Возврат ошибки Keycloak
+            return StatusCode((int)createUserResult.StatusCode, createUserResult.ErrorResponse);
         }
 
 
@@ -142,18 +111,6 @@ namespace SCT.Users.Controllers
                 properties,
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 OpenIdConnectDefaults.AuthenticationScheme);
-        }
-
-        public class TokenResponse
-        {
-            [JsonPropertyName("access_token")]
-            public string AccessToken { get; set; }
-
-            [JsonPropertyName("expires_in")]
-            public int ExpiresIn { get; set; }
-
-            [JsonPropertyName("refresh_token")]
-            public string RefreshToken { get; set; }
         }
 
 

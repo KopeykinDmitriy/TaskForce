@@ -21,11 +21,18 @@ namespace SCT.Users.Repositories
             return await _context.Users.ToListAsync();
         }
 
+
         public async Task<User> AddUserAsync(User user)
         {
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
             return user;
+        }
+
+        // Метод для поиска пользователя по email (для проверки уникальности)
+        public async Task<User?> GetUserByEmailAsync(string email)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.email == email);
         }
     }
 }

@@ -25,8 +25,10 @@ namespace SCT.Users.Services
                 name = userDto.Name,
                 surname = userDto.Surname,
                 email = userDto.Email,
-                password = userDto.Password
+                password = userDto.Password,
+                //role = userDto.Role
             };
+
             return await _repository.AddUserAsync(user);
         }
     }
