@@ -4,10 +4,10 @@
     {
         public int Id { get; set; }
         public required  string Name { get; set; }
-        public string Description { get; set; }
+        public string? Description { get; set; }
         public DateTimeOffset Start_dt {  get; set; }
         public DateTimeOffset End_dt { get; set; }
-        public string Status { get; set; }
+        public string? Status { get; set; }
         public int Priority { get; set; }
 
 

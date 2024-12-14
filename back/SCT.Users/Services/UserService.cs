@@ -80,5 +80,46 @@ namespace SCT.Users.Services
 
             return await _repository.AddUserAsync(user);
         }
+
+
+        // Функция добавления тега пользователю
+        public async Task AddTagToUserAsync(TagDto request)
+        {
+            // Проверяем, существует ли тег в базе данных
+            var tag = await _context.Tags
+                .FirstOrDefaultAsync(t => t.Name == request.TagName);
+
+            // Если тег не существует, создаем новый
+            if (tag == null)
+            {
+                tag = new Tag
+                {
+                    Name = request.TagName
+                };
+
+                _context.Tags.Add(tag);
+                await _context.SaveChangesAsync(); // Сохраняем новый тег
+            }
+
+            // Проверяем, существует ли уже связь между пользователем и тегом
+            var userTag = await _context.UserTags
+                .FirstOrDefaultAsync(ut => ut.UserId == request.UserId && ut.TagId == tag.Id);
+
+            // Если связи нет, создаем новую
+            if (userTag == null)
+            {
+                userTag = new UserTags
+                {
+                    // Связываем с пользователем и тегом
+                    UserId = request.UserId,
+                    TagId = tag.Id,
+                    User = await _context.Users.FindAsync(request.UserId), // Загружаем пользователя
+                    Tag = tag // Устанавливаем объект тега
+                };
+
+                _context.UserTags.Add(userTag);
+                await _context.SaveChangesAsync(); // Сохраняем связь
+            }
+        }
     }
 }

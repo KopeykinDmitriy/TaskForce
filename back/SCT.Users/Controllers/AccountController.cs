@@ -93,6 +93,31 @@ namespace SCT.Users.Controllers
                 OpenIdConnectDefaults.AuthenticationScheme);
         }
 
+        //[AllowAnonymous] // УДАЛИТЬ ПОЗЖЕ!!!!!!!
+        [Authorize]
+        [HttpPost("AddTagToUser")]
+        public async Task<IActionResult> AddTagToUser([FromBody] TagDto request)
+        {
+            if (request == null)
+            {
+                return BadRequest("Request cannot be null");
+            }
+
+            try
+            {
+                // Вызов функции добавления тега к пользователю из сервиса
+                await _userService.AddTagToUserAsync(request);
+
+                // Возвращаем успешный ответ
+                return Ok("Tag successfully added to user.");
+            }
+            catch (Exception ex)
+            {
+                // Логируем внутреннее исключение
+                var innerException = ex.InnerException?.Message ?? "No inner exception.";
+                return StatusCode(500, $"Error adding tag to user: {ex.Message}. Inner exception: {innerException}");
+            }
+        }
 
         [HttpGet("HelloWorld")]
         public string GetString()
