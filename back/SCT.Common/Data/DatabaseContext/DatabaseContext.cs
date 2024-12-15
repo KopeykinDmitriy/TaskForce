@@ -49,16 +49,32 @@ namespace SCT.Common.Data.DatabaseContext
 
 
             // Tasks
-            modelBuilder.Entity<Tasks>()
-                .HasKey(t => t.Id);
+            //modelBuilder.Entity<Tasks>()
+            //    .HasKey(t => t.Id);
 
-            modelBuilder.Entity<Tasks>()
-                .HasOne(t => t.Project)        // У задачи есть один проект
-                .WithMany(p => p.Tasks)        // У проекта может быть много задач
-                .HasForeignKey(t => t.ProjectId); // Внешний ключ - ProjectId
+            //modelBuilder.Entity<Tasks>()
+            //    .HasOne(t => t.Project)        // У задачи есть один проект
+            //    .WithMany(p => p.Tasks)        // У проекта может быть много задач
+            //.HasForeignKey(t => t.ProjectId); // Внешний ключ - ProjectId
 
+            modelBuilder.Entity<Tasks>(entity =>
+            {
+                entity.HasKey(t => t.Id);
+                entity
+                    .HasOne(t => t.Project)        // У задачи есть один проект
+                    .WithMany(p => p.Tasks)        // У проекта может быть много задач
+                    .HasForeignKey(t => t.ProjectId); // Внешний ключ - ProjectId
+                entity
+                    .HasOne(t => t.UserCreate)
+                    .WithMany(u => u.UserCreate)
+                    .HasForeignKey(t => t.UserCreateId);
+                entity
+                    .HasOne(t => t.UserDo)
+                    .WithMany(u => u.UserDo)
+                    .HasForeignKey(t => t.UserDoId);
+            });
 
-            //TasksRelotion
+                //TasksRelotion
             modelBuilder.Entity<TaskRelation>()
                 .HasKey(tr => tr.Id);
 

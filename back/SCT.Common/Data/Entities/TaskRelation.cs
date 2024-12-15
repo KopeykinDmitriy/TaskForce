@@ -2,7 +2,7 @@
 {
     public class TaskRelation
     {
-        public required int Id { get; set; }
+        public int Id { get; set; }
         public required int IdTask1 { get; set; }
         public required int IdTask2 { get; set; }
         public required string Relation { get; set; }

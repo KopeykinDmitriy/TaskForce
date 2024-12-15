@@ -1,11 +1,12 @@
-﻿using System.Net.Http.Headers;
-using System.Text;
-using System.Text.Json;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
+using SCT.Users.Services;
+using SCT.Users.DTOs;
+using SCT.Users.Repositories;
 
 namespace SCT.Users.Controllers
 {
@@ -14,85 +15,59 @@ namespace SCT.Users.Controllers
     [Route("api/[controller]")]
     public class AccountController : Controller
     {
-        private readonly IHttpClientFactory _httpClientFactory;
-        private readonly IConfiguration _configuration;
+        private readonly KeycloakService _keycloakService;
+        private readonly UserService _userService;
 
-        public AccountController(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+        public AccountController(KeycloakService keycloakService, UserService userService)
         {
-            _httpClientFactory = httpClientFactory;
-            _configuration = configuration;
+            _keycloakService = keycloakService ?? throw new ArgumentNullException(nameof(keycloakService));
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
+
 
         [AllowAnonymous]
         [HttpPost("Register")]
         public async Task<IActionResult> RegisterUser(string login, string email, string password)
         {
-            // URL для API Keycloak
-            var keycloakBaseUrl = _configuration["Keycloak:AuthServerUrl"];
-            var realm = _configuration["Keycloak:Realm"];
-            var adminClientId = _configuration["Keycloak:AdminClientId"];
-            var adminClientSecret = _configuration["Keycloak:AdminClientSecret"];
-
-            // Получение admin access token
-            var tokenResponse = await GetAdminAccessToken(keycloakBaseUrl, adminClientId, adminClientSecret);
+            // Получение токена администратора Keycloak
+            var tokenResponse = await _keycloakService.GetAdminAccessToken();
             if (tokenResponse == null || string.IsNullOrEmpty(tokenResponse.AccessToken))
             {
                 return StatusCode(500, "Не удалось получить токен администратора Keycloak.");
             }
 
+            // Создание пользователя в Keycloak
+            var createUserResult = await _keycloakService.CreateUserInKeycloak(tokenResponse.AccessToken, login, email, password);
 
-            // Создание нового пользователя через Keycloak Admin API
-            var httpClient = _httpClientFactory.CreateClient();
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenResponse.AccessToken);
-
-            var createUserPayload = new
+            if (createUserResult.IsSuccess)
             {
-                username = login,
-                email = email,
-                enabled = true,
-                credentials = new[]
+                try
                 {
-                new
+                    // Создание пользователя в базе данных
+                    var userDto = new UserDto
                     {
-                        type = "password",
-                        value = password,
-                        temporary = false
-                    }
+                        Name = login,
+                        Email = email,
+                        //Password = BCrypt.Net.BCrypt.HashPassword(password), // Хэширование, для получения использовать: BCrypt.Net.BCrypt.Verify(password, hashedPassword)
+                        Role = "admin"
+                    };
+
+                    await _userService.AddUserAsync(userDto);
+
+                    return Ok("Пользователь успешно зарегистрирован.");
                 }
-            };
-
-            var response = await httpClient.PostAsync(
-                $"{keycloakBaseUrl}/admin/realms/{realm}/users",
-                new StringContent(JsonSerializer.Serialize(createUserPayload), Encoding.UTF8, "application/json"));
-
-            if (response.IsSuccessStatusCode)
-            {
-                return Ok("Пользователь успешно зарегистрирован.");
+                catch (Exception ex)
+                {
+                    return StatusCode(500, $"Ошибка при добавлении пользователя в базу данных: {ex.Message}");
+                }
             }
 
-            var errorResponse = await response.Content.ReadAsStringAsync();
-            return StatusCode((int)response.StatusCode, errorResponse);
-        }
-
-        private async Task<TokenResponse?> GetAdminAccessToken(string keycloakUrl, string clientId, string clientSecret)
-        {
-            var httpClient = _httpClientFactory.CreateClient();
-            var tokenRequest = new FormUrlEncodedContent(new[]
-            {
-            new KeyValuePair<string, string>("grant_type", "client_credentials"),
-            new KeyValuePair<string, string>("client_id", clientId),
-            new KeyValuePair<string, string>("client_secret", clientSecret)
-        });
-
-            var response = await httpClient.PostAsync($"{keycloakUrl}/protocol/openid-connect/token", tokenRequest);
-
-            if (!response.IsSuccessStatusCode) return null;
-
-            var content = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<TokenResponse>(content);
+            // Возврат ошибки Keycloak
+            return StatusCode((int)createUserResult.StatusCode, createUserResult.ErrorResponse);
         }
 
 
+        //[AllowAnonymous]
         [HttpPost("Logout")]
         public IActionResult Logout()
         {
@@ -118,15 +93,11 @@ namespace SCT.Users.Controllers
                 OpenIdConnectDefaults.AuthenticationScheme);
         }
 
-        public class TokenResponse
-        {
-            public string? AccessToken { get; set; }
-        }
 
         [HttpGet("HelloWorld")]
         public string GetString()
         {
-            return "Hello world";
+            return "Hello world!";
         }
     }
 }
