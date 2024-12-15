@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SCT.Common.Data.DatabaseContext;
-using SCT.Users.Providers;
 using SCT.Users.Repositories;
 using SCT.Users.Services;
 
@@ -16,16 +15,15 @@ builder.Services.AddDbContext<DatabaseContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection"),
         b => b.MigrationsAssembly("SCT.Users")
     ),
-    ServiceLifetime.Scoped
+    ServiceLifetime.Singleton,
+    ServiceLifetime.Singleton
 ); 
 
-builder.Services.AddScoped<UserRepository>(); // Регистрация репозитория
-builder.Services.AddScoped<UserService>();    // Регистрация сервиса
-builder.Services.AddScoped<KeycloakService>();
+builder.Services.AddSingleton<UserRepository>(); // Регистрация репозитория
+builder.Services.AddSingleton<UserService>();    // Регистрация сервиса
+builder.Services.AddSingleton<KeycloakService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient();                // Добавил в DI контейнер, без него ошибки
-builder.Services.AddSingleton<IUsernameProvider, UsernameProvider>();
-builder.Services.AddMemoryCache();
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add(new Microsoft.AspNetCore.Mvc.Authorization.AuthorizeFilter());

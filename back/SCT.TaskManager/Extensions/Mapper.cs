@@ -21,7 +21,7 @@ public static class Mapper
         };
     }
 
-    public static Tasks MapToEntity(this TaskDto dto)
+    public static Tasks MapToEntity(this TaskDto dto, int userId)
     {
         return new Tasks
         {
@@ -32,7 +32,8 @@ public static class Mapper
             Start_dt = dto.StartDateTime,
             End_dt = dto.EndDateTime,
             Priority = dto.Priority,
-            ProjectId = dto.ProjectId
+            ProjectId = dto.ProjectId,
+            UserCreateId = userId
         };
     }
 

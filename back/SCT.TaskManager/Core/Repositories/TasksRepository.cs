@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using SCT.Common.Data.DatabaseContext;
 using SCT.Common.Data.Entities;
 using SCT.TaskManager.Core.Interfaces.Repositories;
+using SCT.TaskManager.Core.Providers;
 using SCT.TaskManager.DTO;
 using SCT.TaskManager.Extensions;
 
@@ -11,16 +12,20 @@ public class TasksRepository : ITasksRepository
 {
     private List<TaskDto> _tasks = new();
     private readonly DatabaseContext _context;
+    private readonly IUsernameProvider _usernameProvider;
 
-    public TasksRepository(DatabaseContext context)
+    public TasksRepository(DatabaseContext context, IUsernameProvider usernameProvider)
     {
         _context = context;
+        _usernameProvider = usernameProvider;
     }
 
     public async Task AddAsync(TaskDto task)
     {
         await InitializeAsync();
-        var taskEntity = task.MapToEntity();
+        var userName = _usernameProvider.Get();
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.name == userName);
+        var taskEntity = task.MapToEntity(user.id);
         taskEntity.TaskTags = await GetTaskTagsAsync(task);
         await _context.Tasks.AddAsync(taskEntity);
         await _context.SaveChangesAsync();
@@ -30,7 +35,9 @@ public class TasksRepository : ITasksRepository
     public async Task<TaskDto?> GetAsync(int id)
     {
         await InitializeAsync();
-        return _tasks.FirstOrDefault(t => t.Id == id);
+        var task = _tasks.FirstOrDefault(t => t.Id == id);
+        var availableTasks = await GetAvailableTasksAsync([task]);
+        return availableTasks.FirstOrDefault();
     }
     
     public async Task UpdateAsync(TaskDto updatedTask)
@@ -45,7 +52,7 @@ public class TasksRepository : ITasksRepository
         if (existingTask == null)
             throw new InvalidOperationException("Task not found");
         
-        var updatedTaskEntity = updatedTask.MapToEntity();
+        var updatedTaskEntity = updatedTask.MapToEntity(existingTask.UserCreateId);
 
         // Обновляем поля сущности
         existingTask.Name = updatedTaskEntity.Name;
@@ -70,7 +77,9 @@ public class TasksRepository : ITasksRepository
     public async Task<List<TaskDto>> GetAllAsync(int projectId)
     {
         await InitializeAsync();
-        return _tasks.Where(t => t.ProjectId == projectId).ToList();
+        var tasks = _tasks.Where(t => t.ProjectId == projectId).ToList();
+        var availableTasks = await GetAvailableTasksAsync(tasks);
+        return availableTasks;
     }
 
     private async Task InitializeAsync()
@@ -101,5 +110,12 @@ public class TasksRepository : ITasksRepository
         await _context.SaveChangesAsync();
         tags = await _context.Tags.Where(t => tagNames.Contains(t.Name.ToLower())).ToListAsync();
         return tags.Select(t => t.Id).ToList();
+    }
+
+    private async Task<List<TaskDto>> GetAvailableTasksAsync(List<TaskDto> tasks)
+    {
+        var user = await _context.Users.Include(u => u.UserTags).ThenInclude(ut => ut.Tag).FirstOrDefaultAsync(u => u.name == _usernameProvider.Get());
+        var availableTasks = tasks.Where(t => t.Tags.Any(tag => user.UserTags.Select(ut => ut.Tag.Name.ToLower()).Contains(tag.ToLower())));
+        return availableTasks.ToList();
     }
 }
