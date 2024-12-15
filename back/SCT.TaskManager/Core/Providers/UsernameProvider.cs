@@ -1,4 +1,4 @@
-namespace SCT.Users.Providers
+namespace SCT.TaskManager.Core.Providers
 {
     public class UsernameProvider : IUsernameProvider
     {

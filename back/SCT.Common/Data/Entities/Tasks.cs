@@ -19,7 +19,7 @@
 
         // Связи
         public Project Project { get; set; } = null!;
-        public required User UserCreate { get; set; }
+        public User UserCreate { get; set; }
         public User? UserDo { get; set; }
         public ICollection<TaskRelation> TaskRelations1 { get; set; } = new List<TaskRelation>(); // Как Task1
         public ICollection<TaskRelation> TaskRelations2 { get; set; } = new List<TaskRelation>(); // Как Task2
