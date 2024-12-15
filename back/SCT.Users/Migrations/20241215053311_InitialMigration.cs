@@ -48,7 +48,7 @@ namespace SCT.Users.Migrations
                     name = table.Column<string>(type: "text", nullable: false),
                     surname = table.Column<string>(type: "text", nullable: true),
                     email = table.Column<string>(type: "text", nullable: true),
-                    password = table.Column<string>(type: "text", nullable: false)
+                    role = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {

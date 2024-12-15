@@ -163,8 +163,7 @@ namespace SCT.Users.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("password")
-                        .IsRequired()
+                    b.Property<string>("role")
                         .HasColumnType("text");
 
                     b.Property<string>("surname")

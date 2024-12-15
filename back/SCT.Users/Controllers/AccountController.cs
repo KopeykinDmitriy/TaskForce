@@ -48,8 +48,8 @@ namespace SCT.Users.Controllers
                     {
                         Name = login,
                         Email = email,
-                        Password = BCrypt.Net.BCrypt.HashPassword(password) // Хэширование, для получения использовать: BCrypt.Net.BCrypt.Verify(password, hashedPassword)
-                        //Role = "admin" // позже добавить в метод добавление обычного пользователя
+                        //Password = BCrypt.Net.BCrypt.HashPassword(password), // Хэширование, для получения использовать: BCrypt.Net.BCrypt.Verify(password, hashedPassword)
+                        Role = "admin"
                     };
 
                     await _userService.AddUserAsync(userDto);
@@ -67,7 +67,7 @@ namespace SCT.Users.Controllers
         }
 
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [HttpPost("Logout")]
         public IActionResult Logout()
         {
@@ -93,37 +93,11 @@ namespace SCT.Users.Controllers
                 OpenIdConnectDefaults.AuthenticationScheme);
         }
 
-        //[AllowAnonymous] // УДАЛИТЬ ПОЗЖЕ!!!!!!!
-        [Authorize]
-        [HttpPost("AddTagToUser")]
-        public async Task<IActionResult> AddTagToUser([FromBody] TagDto request)
-        {
-            if (request == null)
-            {
-                return BadRequest("Request cannot be null");
-            }
-
-            try
-            {
-                var tagList = new List<TagDto> { request };
-
-                await _userService.AddTagsToUserAsync(tagList);
-
-                return Ok("Tag successfully added to user.");
-            }
-            catch (Exception ex)
-            {
-                var innerException = ex.InnerException?.Message ?? "No inner exception.";
-                return StatusCode(500, $"Error adding tag to user: {ex.Message}. Inner exception: {innerException}");
-            }
-        }
 
         [HttpGet("HelloWorld")]
         public string GetString()
         {
-            return "Hello world";
+            return "Hello world!";
         }
     }
 }
-
-

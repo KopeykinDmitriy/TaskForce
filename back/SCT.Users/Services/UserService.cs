@@ -40,56 +40,16 @@ namespace SCT.Users.Services
                 name = userDto.Name,
                 surname = userDto.Surname,
                 email = userDto.Email,
-                password = userDto.Password,
-                //role = userDto.Role
+                //password = userDto.Password,
+                role = userDto.Role
             };
 
             return await _repository.AddUserAsync(user);
         }
 
-
-        public async Task AddTagsToUserAsync(List<TagDto> tagDtos)
+        public Task AddTagsToUserAsync(int userId, List<string> tagNames)
         {
-            foreach (var tagDto in tagDtos)
-            {
-                var user = await _context.Users.FindAsync(tagDto.UserId);
-                if (user == null)
-                {
-                    throw new Exception($"User with ID {tagDto.UserId} not found");
-                }
-
-                var tag = await _context.Tags
-                    .FirstOrDefaultAsync(t => t.Name == tagDto.TagName);
-
-                if (tag == null)
-                {
-                    tag = new Tag
-                    {
-                        Name = tagDto.TagName
-                    };
-
-                    _context.Tags.Add(tag);
-                    await _context.SaveChangesAsync(); 
-                }
-
-                var userTag = await _context.UserTags
-                    .FirstOrDefaultAsync(ut => ut.UserId == tagDto.UserId && ut.TagId == tag.Id);
-
-                if (userTag == null)
-                {
-                    userTag = new UserTags
-                    {
-                        UserId = tagDto.UserId,
-                        TagId = tag.Id,
-                        User = user,
-                        Tag = tag
-                    };
-
-                    _context.UserTags.Add(userTag);
-                }
-            }
-
-            await _context.SaveChangesAsync();
+            return _repository.AddTagsToUserAsync(userId, tagNames);
         }
     }
 }

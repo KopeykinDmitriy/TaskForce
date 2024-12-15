@@ -6,8 +6,8 @@ namespace SCT.Common.Data.Entities
         public required string name { get; set; }
         public string? surname {get; set;}
         public string? email { get; set;}
-        public required string password {get; set;}
-        //public string? role { get; set;}
+        //public required string password {get; set;}
+        public string? role { get; set; }
 
 
         // связи с пользователями

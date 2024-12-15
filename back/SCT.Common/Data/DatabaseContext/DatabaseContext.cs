@@ -75,7 +75,7 @@ namespace SCT.Common.Data.DatabaseContext
             });
 
                 //TasksRelotion
-                modelBuilder.Entity<TaskRelation>()
+            modelBuilder.Entity<TaskRelation>()
                 .HasKey(tr => tr.Id);
 
             // Связь TaskRelation с Tasks через IdTask1

@@ -20,6 +20,7 @@ namespace SCT.Users.Services
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }
 
+
         public class TokenResponse
         {
             [JsonPropertyName("access_token")]
@@ -64,6 +65,7 @@ namespace SCT.Users.Services
             var content = await response.Content.ReadAsStringAsync();
             return JsonSerializer.Deserialize<TokenResponse>(content);
         }
+
 
         public async Task<(bool IsSuccess, HttpStatusCode StatusCode, string? ErrorResponse)> CreateUserInKeycloak(string accessToken, string login, string email, string password)
         {

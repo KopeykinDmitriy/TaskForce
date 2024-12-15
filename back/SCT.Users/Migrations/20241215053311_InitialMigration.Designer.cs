@@ -12,7 +12,7 @@ using SCT.Common.Data.DatabaseContext;
 namespace SCT.Users.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20241214052553_InitialMigration")]
+    [Migration("20241215053311_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -166,8 +166,7 @@ namespace SCT.Users.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("password")
-                        .IsRequired()
+                    b.Property<string>("role")
                         .HasColumnType("text");
 
                     b.Property<string>("surname")
