@@ -20,8 +20,9 @@ public class ProjectsRepository : IProjectsRepository
     public async Task AddAsync(ProjectDto project)
     {
         await InitializeAsync();
-        await _context.Projects.AddAsync(project.MapToEntity());
+        var projectEntity = await _context.Projects.AddAsync(project.MapToEntity());
         await _context.SaveChangesAsync();
+        project.Id = projectEntity.Entity.Id;
         _projects.Add(project);
     }
     

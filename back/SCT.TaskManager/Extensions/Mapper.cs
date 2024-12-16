@@ -1,4 +1,5 @@
 using SCT.Common.Data.Entities;
+using SCT.TaskManager.Core.Enums;
 using SCT.TaskManager.DTO;
 
 namespace SCT.TaskManager.Extensions;
@@ -15,7 +16,7 @@ public static class Mapper
             Status = task.Status,
             StartDateTime = task.Start_dt,
             EndDateTime = task.End_dt,
-            Priority = task.Priority,
+            Priority = (TaskPriority)task.Priority,
             ProjectId = task.ProjectId,
             Tags = task.TaskTags.Select(tt => tt.Tag.Name).ToList()
         };
@@ -29,9 +30,9 @@ public static class Mapper
             Name = dto.Name,
             Description = dto.Description,
             Status = dto.Status,
-            Start_dt = dto.StartDateTime,
+            Start_dt = DateTimeOffset.Now,
             End_dt = dto.EndDateTime,
-            Priority = dto.Priority,
+            Priority = (int)dto.Priority,
             ProjectId = dto.ProjectId,
             UserCreateId = userId
         };

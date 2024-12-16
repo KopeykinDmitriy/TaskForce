@@ -20,7 +20,7 @@ namespace SCT.Users.Repositories
         {
             if (!_users.Any())
             {
-                _users = await _context.Users.ToListAsync();
+                _users = await _context.Users.Include(u => u.UserTags).ThenInclude(ut => ut.Tag).ToListAsync();
             }
 
             return _users;

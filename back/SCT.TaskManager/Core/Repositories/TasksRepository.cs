@@ -27,8 +27,9 @@ public class TasksRepository : ITasksRepository
         var user = await _context.Users.FirstOrDefaultAsync(u => u.name == userName);
         var taskEntity = task.MapToEntity(user.id);
         taskEntity.TaskTags = await GetTaskTagsAsync(task);
-        await _context.Tasks.AddAsync(taskEntity);
+        var newTask = await _context.Tasks.AddAsync(taskEntity);
         await _context.SaveChangesAsync();
+        task.Id = newTask.Entity.Id;
         _tasks.Add(task);
     }
     

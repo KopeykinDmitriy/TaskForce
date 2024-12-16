@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SCT.Common.Data.DatabaseContext;
 using SCT.TaskManager.Core.Interfaces.Repositories;
@@ -15,11 +16,25 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
         builder.Configuration.AddEnvironmentVariables();
+        
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowSpecificOrigin",
+                              builder =>
+                              {
+                                  builder
+                                      .WithOrigins("http://localhost:3000") // Разрешаем все домены
+                                      .AllowAnyHeader() // Разрешаем любые заголовки
+                                      .AllowAnyMethod() // Разрешаем любые методы
+                                      .AllowCredentials(); // Разрешаем куки и авторизацию
+                              });
+        });
 
         // Add services to the container.
         builder.Services.AddSingleton<ITasksRepository, TasksRepository>();
         builder.Services.AddSingleton<IProjectsRepository, ProjectsRepository>();
         builder.Services.AddSingleton<IUsernameProvider, UsernameProvider>();
+        builder.Services.AddHttpContextAccessor();
         builder.Services.AddDbContext<DatabaseContext>(options =>
             options.UseNpgsql(
                 builder.Configuration.GetConnectionString("DefaultConnection"),
@@ -74,6 +89,10 @@ public class Program
                 options.RequireHttpsMetadata = bool.Parse(builder.Configuration["Authentication:RequireHttpsMetadata"] ?? "false");
                 options.Audience = builder.Configuration["Authentication:Aud"];
                 options.SaveToken = bool.Parse(builder.Configuration["Authentication:SaveToken"] ?? "true");
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = false 
+                };
             });
         
         builder.Services.AddAuthorization(options =>
@@ -92,11 +111,21 @@ public class Program
         }
         
         // Configure the HTTP request pipeline.
-        if (app.Environment.IsDevelopment())
+        app.UseSwagger(c =>
         {
-            app.UseSwagger();
-            app.UseSwaggerUI();
-        }
+            c.PreSerializeFilters.Add((swagger, httpReq) =>
+            {
+                swagger.Servers = new List<OpenApiServer> { new OpenApiServer { Url = $"{httpReq.Scheme}://{httpReq.Host.Value}/{httpReq.Headers["X-Forwarded-Prefix"]}" } };
+            });
+        });
+
+        app.UseSwaggerUI(c =>
+        {
+            c.SwaggerEndpoint("v1/swagger.json", "My API V1");
+        });
+        
+        app.UseCors("AllowSpecificOrigin");
+        
 
         app.UseHttpsRedirection();
 
