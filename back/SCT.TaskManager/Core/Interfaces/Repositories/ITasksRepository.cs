@@ -1,4 +1,3 @@
-using SCT.Common.Data.Entities;
 using SCT.TaskManager.DTO;
 
 namespace SCT.TaskManager.Core.Interfaces.Repositories;

@@ -1,8 +1,6 @@
 using SCT.Common.Data.Entities;
 using SCT.Users.DTOs;
 using SCT.Users.Repositories;
-using Microsoft.EntityFrameworkCore;
-using SCT.Common.Data.DatabaseContext;
 
 namespace SCT.Users.Services
 {

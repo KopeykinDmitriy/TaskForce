@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using SCT.Common.Data.DatabaseContext;
-using SCT.Common.Data.Entities;
 using SCT.TaskManager.Core.Interfaces.Repositories;
 using SCT.TaskManager.DTO;
 using SCT.TaskManager.Extensions;

@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SCT.Users.DTOs;
 using SCT.Users.Services;
-using SCT.Users.Repositories;
 
 namespace SCT.Users.Controllers;
 

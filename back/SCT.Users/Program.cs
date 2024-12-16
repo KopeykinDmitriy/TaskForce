@@ -38,27 +38,21 @@ public class Program
                                                        ServiceLifetime.Singleton
         ); 
 
-        builder.Services.AddSingleton<UserRepository>(); // Регистрация репозитория
-        builder.Services.AddSingleton<UserService>();    // Регистрация сервиса
+        builder.Services.AddSingleton<UserRepository>(); 
+        builder.Services.AddSingleton<UserService>();    
         builder.Services.AddSingleton<KeycloakService>();
         builder.Services.AddHttpContextAccessor();
-        builder.Services.AddHttpClient();                // Добавил в DI контейнер, без него ошибки
+        builder.Services.AddHttpClient();                
         builder.Services.AddControllers(options =>
         {
             options.Filters.Add(new Microsoft.AspNetCore.Mvc.Authorization.AuthorizeFilter());
         });
 
-// Настройка Swagger
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(c =>
         {
-            c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
-                //Description = "Введите JWT токен следующим образом: Bearer {токен}",
-                //Name = "Authorization",
-                //In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-                //Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
-                //Scheme = "bearer"
                 Name = "Authorization",
                 Type = SecuritySchemeType.ApiKey,
                 In = ParameterLocation.Header,
@@ -66,14 +60,14 @@ public class Program
                 BearerFormat = "JWT",
                 Description = "Please enter the JWT with Bearer keyword"
             });
-            c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+            c.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
                 {
-                    new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+                    new OpenApiSecurityScheme
                     {
-                        Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                        Reference = new OpenApiReference
                         {
-                            Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                            Type = ReferenceType.SecurityScheme,
                             Id = "Bearer"
                         }
                     },
@@ -83,7 +77,6 @@ public class Program
         });
 
 
-// Настройка аутентификации и авторизации
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                .AddJwtBearer(options =>
                {
@@ -97,23 +90,19 @@ public class Program
                    };
                });
 
-        builder.Services.AddAuthorization(options =>
-        {
-            options.FallbackPolicy = new AuthorizationPolicyBuilder()
+        builder.Services.AddAuthorizationBuilder()
+            .SetFallbackPolicy(new AuthorizationPolicyBuilder()
                                      .RequireAuthenticatedUser()
-                                     .Build();
-        });
+                                     .Build());
 
         var app = builder.Build();
 
-// Выполнение миграций при старте
         using (var scope = app.Services.CreateScope())
         {
             var dbContext = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
             dbContext.Database.Migrate();
         }
 
-// Configure the HTTP request pipeline.
         app.UseSwagger(c =>
         {
             c.PreSerializeFilters.Add((swagger, httpReq) =>

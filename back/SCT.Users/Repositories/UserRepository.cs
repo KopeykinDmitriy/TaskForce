@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SCT.Common.Data.DatabaseContext;
 using SCT.Common.Data.Entities;
-using SCT.Users.DTOs;
 
 namespace SCT.Users.Repositories
 {
@@ -15,7 +14,9 @@ namespace SCT.Users.Repositories
             _context = context;
         }
 
-        // Метод для получения всех пользователей
+        /// <summary>
+        /// Метод для получения всех пользователей
+        /// </summary>
         public async Task<List<User>> GetAllUsersAsync()
         {
             if (!_users.Any())
@@ -26,7 +27,9 @@ namespace SCT.Users.Repositories
             return _users;
         }
 
-        // Метод для добавления нового пользователя
+        /// <summary>
+        /// Метод для добавления нового пользователя
+        /// </summary>
         public async Task<User> AddUserAsync(User user)
         {
             _context.Users.Add(user);
@@ -36,7 +39,9 @@ namespace SCT.Users.Repositories
             return user;
         }
 
-        // Метод для поиска пользователя по email
+        /// <summary>
+        /// Метод для поиска пользователя по email
+        /// </summary>
         public async Task<User?> GetUserByEmailAsync(string email)
         {
             var user = _users.FirstOrDefault(u => u.email == email);
@@ -54,7 +59,9 @@ namespace SCT.Users.Repositories
             return user;
         }
 
-        // Метод для поиска пользователя по ID
+        /// <summary>
+        /// Метод для поиска пользователя по ID
+        /// </summary>
         public async Task<User?> GetUserByIdAsync(int userId)
         {
             var user = _users.FirstOrDefault(u => u.id == userId);
@@ -72,7 +79,9 @@ namespace SCT.Users.Repositories
             return user;
         }
 
-        // Метод создания тегов для пользователя
+        /// <summary>
+        /// Метод создания тегов для пользователя
+        /// </summary>
         public async Task AddTagsToUserAsync(int userId, List<string> tagNames)
         {
             foreach (var tagName in tagNames)

@@ -45,9 +45,8 @@ public class TasksRepository : ITasksRepository
     {
         await InitializeAsync();
 
-        // Находим отслеживаемую задачу в контексте
         var existingTask = await _context.Tasks
-            .Include(t => t.TaskTags) // Загружаем связанные TaskTags
+            .Include(t => t.TaskTags)
             .FirstOrDefaultAsync(t => t.Id == updatedTask.Id);
 
         if (existingTask == null)
@@ -55,7 +54,6 @@ public class TasksRepository : ITasksRepository
         
         var updatedTaskEntity = updatedTask.MapToEntity(existingTask.UserCreateId);
 
-        // Обновляем поля сущности
         existingTask.Name = updatedTaskEntity.Name;
         existingTask.Description = updatedTaskEntity.Description;
         existingTask.Start_dt = updatedTaskEntity.Start_dt;
@@ -63,14 +61,11 @@ public class TasksRepository : ITasksRepository
         existingTask.Status = updatedTaskEntity.Status;
         existingTask.Priority = updatedTaskEntity.Priority;
 
-        // Обновляем связанные теги
         var newTaskTags = await GetTaskTagsAsync(updatedTask);
         existingTask.TaskTags = newTaskTags;
 
-        // Сохраняем изменения
         await _context.SaveChangesAsync();
 
-        // Обновляем кэш задач
         var taskIndex = _tasks.FindIndex(t => t.Id == updatedTask.Id);
         _tasks[taskIndex] = updatedTask;
     }
