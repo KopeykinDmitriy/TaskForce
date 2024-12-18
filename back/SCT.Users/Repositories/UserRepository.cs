@@ -19,12 +19,32 @@ namespace SCT.Users.Repositories
         /// </summary>
         public async Task<List<User>> GetAllUsersAsync()
         {
-            if (!_users.Any())
+            if (_users.Count == 0)
             {
-                _users = await _context.Users.Include(u => u.UserTags).ThenInclude(ut => ut.Tag).ToListAsync();
+                _users = await _context.Users.Include(u => u.UserTags).ThenInclude(ut => ut.Tag).Include(u => u.UserProjects).ToListAsync();
             }
-
+            
             return _users;
+        }
+
+        public async Task<List<User>> GetAllUsersByProjectAsync(int projectId)
+        {
+            if (_users.Count == 0)
+            {
+                _users = await _context.Users.Include(u => u.UserTags).ThenInclude(ut => ut.Tag).Include(u => u.UserProjects).ToListAsync();
+            }
+            
+            return _users.Where(u => u.UserProjects.Any(up => up.ProjectId == projectId)).ToList();
+        }
+
+        public async Task<User> GetUserByLogin(string login)
+        {
+            if (_users.Count == 0)
+            {
+                _users = await _context.Users.Include(u => u.UserTags).ThenInclude(ut => ut.Tag).Include(u => u.UserProjects).ToListAsync();
+            }
+            
+            return _users.FirstOrDefault(u => string.Equals(u.name.ToLower(), login.ToLower()));
         }
 
         /// <summary>
@@ -32,51 +52,20 @@ namespace SCT.Users.Repositories
         /// </summary>
         public async Task<User> AddUserAsync(User user)
         {
-            _context.Users.Add(user);
+            var newUser = _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            _users.Add(user);
+            _users.Add(newUser.Entity);
             return user;
         }
 
-        /// <summary>
-        /// Метод для поиска пользователя по email
-        /// </summary>
-        public async Task<User?> GetUserByEmailAsync(string email)
+        public async Task AddUserToProjectAsync(int userId, int projectId)
         {
-            var user = _users.FirstOrDefault(u => u.email == email);
-
-            if (user == null)
-            {
-                user = await _context.Users.FirstOrDefaultAsync(u => u.email == email);
-
-                if (user != null && !_users.Contains(user))
-                {
-                    _users.Add(user);
-                }
-            }
-
-            return user;
-        }
-
-        /// <summary>
-        /// Метод для поиска пользователя по ID
-        /// </summary>
-        public async Task<User?> GetUserByIdAsync(int userId)
-        {
-            var user = _users.FirstOrDefault(u => u.id == userId);
-
-            if (user == null)
-            {
-                user = await _context.Users.FirstOrDefaultAsync(u => u.id == userId);
-
-                if (user != null && !_users.Contains(user))
-                {
-                    _users.Add(user); 
-                }
-            }
-
-            return user;
+            var userProject = new UserProject { UserId = userId, ProjectId = projectId };
+            _context.UserProjects.Add(userProject);
+            await _context.SaveChangesAsync();
+            var ind = _users.FindIndex(u => u.id == userId);
+            _users[ind].UserProjects.Add(userProject);
         }
 
         /// <summary>

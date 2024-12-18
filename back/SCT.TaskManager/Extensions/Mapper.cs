@@ -12,17 +12,19 @@ public static class Mapper
         {
             Id = task.Id,
             Name = task.Name,
-            Description = task.Description,
-            Status = task.Status,
+            Description = task.Description ?? string.Empty,
+            Status = task.Status ?? "TO_DO",
             StartDateTime = task.Start_dt,
             EndDateTime = task.End_dt,
             Priority = (TaskPriority)task.Priority,
             ProjectId = task.ProjectId,
-            Tags = task.TaskTags.Select(tt => tt.Tag.Name).ToList()
+            Tags = task.TaskTags.Select(tt => tt.Tag.Name).ToList(),
+            CreatorName = task.UserCreate.name,
+            ExecutorName = task.UserDo?.name ?? string.Empty
         };
     }
 
-    public static Tasks MapToEntity(this TaskDto dto, int userId)
+    public static Tasks MapToEntity(this TaskDto dto, int userCreatorId, int? userExecutorId)
     {
         return new Tasks
         {
@@ -34,7 +36,8 @@ public static class Mapper
             End_dt = dto.EndDateTime,
             Priority = (int)dto.Priority,
             ProjectId = dto.ProjectId,
-            UserCreateId = userId
+            UserCreateId = userCreatorId,
+            UserDoId = userExecutorId
         };
     }
 
@@ -46,7 +49,8 @@ public static class Mapper
             Name = project.Name,
             Description = project.Description,
             UsersCount = project.UserProjects.Count(userProject => userProject.ProjectId == project.Id),
-            TasksCount = project.Tasks.Count(task => task.ProjectId == project.Id)
+            TasksCount = project.Tasks.Count(task => task.ProjectId == project.Id),
+            UserNames = project.UserProjects.Select(up => up.User.name.ToLower()).ToList()
         };
     }
 

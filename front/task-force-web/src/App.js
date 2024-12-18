@@ -21,16 +21,19 @@ const App = () => {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/logout" element={<LogoutPage />} />
           <Route element={<SidebarContext />}>
-            <Route path="/" element={
+            <Route path="/:projectId" element={
               <PrivateRoute><KanbanBoard /></PrivateRoute>
             } />
-            <Route path="/tasks/:taskId" element={
+            <Route path="/:projectId/tasks/:taskId" element={
               <PrivateRoute><TaskDetails /></PrivateRoute>
             } />
-            <Route path="/tasks/:taskId/edit" element={
+            <Route path="/:projectId/tasks/:taskId/edit" element={
               <PrivateRoute><EditCreateTaskForm /></PrivateRoute>
             } />
-            <Route path="/settings/users" element={
+            <Route path="/:projectId/tasks/create" element={
+              <PrivateRoute><EditCreateTaskForm /></PrivateRoute>
+            } />
+            <Route path="/:projectId/settings/users" element={
               <PrivateRoute><UserManagementPage /></PrivateRoute>
             } />
           </Route>
@@ -40,7 +43,7 @@ const App = () => {
           <Route path="/create-new-project" element={
             <PrivateRoute><CreateNewProjectModal /></PrivateRoute>
             }/>
-          <Route path="*" element={<Navigate to="/" />} />
+          <Route path="*" element={<Navigate to="/projects" />} />
         </Routes>
       </Router>
     </AuthProvider>  

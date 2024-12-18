@@ -2,27 +2,27 @@ import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import Select from 'react-select';
 import '../styles/UserModal.css';
-
-const existingTags = [
-  'tag1', 'tag2', 'tag3', 'tag4', 'tag5', 'tag6', 'tag7', 'tag8', 'tag9', 'tag10',
-  'tag11', 'tag12', 'tag13', 'tag14', 'tag15'
-];
-
-const tagOptions = existingTags.map(tag => ({ value: tag, label: tag }));
+import { getAllTags } from '../services/api';
 
 const CreateUserModal = ({ type, user, onSave, onClose }) => {
-  const [name, setName] = useState(user?.name || '');
   const [role, setRole] = useState(user?.role || 'user');
   const [selectedTags, setSelectedTags] = useState(user?.tags?.map(tag => ({ value: tag, label: tag })) || []);
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
+  const [tagOptions, setTagOptions] = useState([]);
 
   useEffect(() => {
     if (type === 'edit' && user) {
-      setName(user.name);
       setRole(user.role);
       setSelectedTags(user.tags.map(tag => ({ value: tag, label: tag })));
     }
+
+    const getTags = async () => {
+      const tags = await getAllTags();
+      const tagOptions = tags.map(tag => ({ value: tag, label: tag }));
+      setTagOptions(tagOptions);
+    }
+    getTags();
   }, [type, user]);
 
   const handleSubmit = (e) => {
@@ -34,7 +34,6 @@ const CreateUserModal = ({ type, user, onSave, onClose }) => {
     }
 
     const userData = {
-      name,
       role,
       tags: selectedTags.map(tag => tag.value),
     };
@@ -52,13 +51,6 @@ const CreateUserModal = ({ type, user, onSave, onClose }) => {
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <h3>{type === 'edit' ? 'Редактировать пользователя' : 'Создать пользователя'}</h3>
         <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            placeholder="Имя пользователя"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
           {type === 'create' && (
             <>
               <input
@@ -66,6 +58,7 @@ const CreateUserModal = ({ type, user, onSave, onClose }) => {
                 placeholder="Логин"
                 value={login}
                 onChange={(e) => setLogin(e.target.value)}
+                autoComplete="off"
                 required
               />
               <input
@@ -73,6 +66,7 @@ const CreateUserModal = ({ type, user, onSave, onClose }) => {
                 placeholder="Пароль"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                autoComplete="new-password"
                 required
               />
             </>

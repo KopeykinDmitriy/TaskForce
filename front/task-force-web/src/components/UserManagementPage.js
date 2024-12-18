@@ -1,19 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/UserManagement.css';
 import CreateUserModal from './CreateUserModal';
 import AddUserModal from './AddUserModal';
+import { getUsersByProject, addUser, getUsers } from '../services/api';
+import { useParams } from 'react-router-dom';
 
-const initialUsers = [
-    { id: 1, name: 'Иван', role: 'user', tags: ['tag1', 'tag2'] },
-    { id: 2, name: 'Мария', role: 'admin', tags: ['tag3'] },
-    { id: 3, name: 'Алексей', role: 'user', tags: ['tag1', 'tag4'] },
-  ];
+
   
   const UserManagementPage = () => {
-    const [users, setUsers] = useState(initialUsers);
+    const { projectId } = useParams();
+    const [users, setUsers] = useState([]);
     const [modalType, setModalType] = useState(null);
     const [currentUser, setCurrentUser] = useState(null);
     const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
+
+    useEffect(() => {
+          const getAllUsers = async () => {
+            const fetchedUsers = await getUsersByProject(projectId);
+            setUsers(fetchedUsers);
+          };
+      
+          getAllUsers();
+        }, []);
   
     const openModal = (type, user = null) => {
       setModalType(type);
@@ -29,13 +37,17 @@ const initialUsers = [
       setIsAddUserModalOpen(true);
     };
   
-    const handleSaveUser = (userData) => {
+    const handleSaveUser = async (userData) => {
       if (currentUser) {
         // При редактировании обновляем данные пользователя
         setUsers(users.map(u => (u.id === currentUser.id ? { ...u, ...userData } : u)));
       } else {
         // При создании нового пользователя добавляем его в список
-        setUsers([...users, { ...userData, id: Date.now() }]);
+        
+        userData.projectId = projectId;
+        await addUser(userData)
+        const fetchedUsers = await getUsersByProject(projectId);
+        setUsers(fetchedUsers);
       }
   
       closeModal();

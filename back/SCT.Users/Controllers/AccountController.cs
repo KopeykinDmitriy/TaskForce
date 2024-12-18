@@ -22,7 +22,7 @@ namespace SCT.Users.Controllers
 
         [AllowAnonymous]
         [HttpPost("Register")]
-        public async Task<IActionResult> RegisterUser(string login, string email, string password, string role, List<string> tags)
+        public async Task<IActionResult> RegisterUser(string login, string email, string password, string role, int projectId, List<string> tags)
         {
             // Получение токена администратора Keycloak
             var tokenResponse = await _keycloakService.GetAdminAccessToken();
@@ -44,7 +44,8 @@ namespace SCT.Users.Controllers
                         Name = login,
                         Email = email,
                         Role = role,
-                        Tags = tags
+                        Tags = tags,
+                        ProjectId = projectId
                     };
 
                     await _userService.AddUserAsync(userDto);

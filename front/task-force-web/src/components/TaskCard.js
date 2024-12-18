@@ -1,45 +1,44 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import '../styles/TaskCard.css'
 
 const priorityColors = {
-  'very high': '#f00',
-  'high': '#ff5e5e',
-  'medium': '#fac337',
-  'low': '#eafa37',
-  'lowest': '#83ff08',
+  'VeryHigh': '#f00',
+  'High': '#ff5e5e',
+  'Medium': '#fac337',
+  'Low': '#eafa37',
+  'Lowest': '#83ff08',
 };
 
-const TaskCard = ({ task }) => {
-
+const TaskCard = ({ task, projectId }) => {
   const getAuthor = () => {
-    if (task.author == null)
+    if (task.executorName == "")
       return (<p/>)
     return (
         <p style={{'margin-bottom': '0px', display: 'flex', 'justify-content': 'center'}}>
         <img src="/images/user.png" width="20" height="20" />
-        {task.author}</p>
+        {task.executorName}</p>
     )
   }
 
   const getDate = () => {
-    if (task.date == null)
+    if (task.endDateTime == null)
       return (<p/>)
     return (
       <p style={{'margin-bottom': '0px', display: 'flex', 'justify-content': 'center'}}>
         <img src="/images/clock.png" width="20" height="20" />
-        {task.date}</p>
+        {task.endDateTime.slice(0,10)}</p>
     )
   }
-
+console.log(projectId);
   return (
-    <Link to={`/tasks/${task.id}`} class="card text-dark mb-3 text-decoration-none" style={{height: '9rem', overflow: 'hidden', boxShadow: '2px 2px 5px grey'}}>
+    <Link to={`/${projectId}/tasks/${task.id}`} class="card text-dark mb-3 text-decoration-none" style={{height: '9rem', overflow: 'hidden', boxShadow: '2px 2px 5px grey'}}>
       <div className="card-body d-flex flex-column card-body-hover" style={{'justify-content': 'space-between', 'padding-bottom': '5px'}}>
         <div
         className="priority-indicator"
         style={{ backgroundColor: priorityColors[task.priority] }}
         />
-        <h5 class="card-title text-truncate-2">{task.title}</h5>
+        <h5 class="card-title text-truncate-2">{task.name}</h5>
         <div>
           <div class="task-hashtags" style={{'margin-bottom': '3px'}}>
             {task.tags.slice(0, 6).map((tag, index) => (

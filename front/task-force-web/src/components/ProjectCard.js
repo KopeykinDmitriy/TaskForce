@@ -1,27 +1,20 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import '../styles/ProjectCard.css'
 
-const ProjectCard = ({ name, tasks, users }) => {
+const ProjectCard = ({id, name, tasksCount, usersCount}) => {
   return (
-    <div style={{
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      backgroundColor: '#d3d3d3',
-      padding: '10px 20px',
-      borderRadius: '10px',
-      width: '80%',
-      fontFamily: 'Arial, sans-serif',
-    }}>
-      <div style={{ fontSize: '18px', fontWeight: 'bold' }}>{name}</div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-        <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-          {tasks} 📋
-        </span>
-        <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-          {users} 👤
-        </span>
-      </div>
-    </div>
+    <Link class='link-project' to={`/${id}`}>
+        <div style={{ fontSize: '18px', fontWeight: 'bold' }}>{name}</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+            {tasksCount} 📋
+          </span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+            {usersCount} 👤
+          </span>
+        </div>
+    </Link>
   );
 };
 

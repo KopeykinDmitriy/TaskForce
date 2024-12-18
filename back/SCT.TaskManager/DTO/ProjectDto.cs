@@ -7,4 +7,5 @@ public class ProjectDto
     public string Description { get; set; }
     public int UsersCount { get; set; }
     public int TasksCount { get; set; }
+    public List<string> UserNames { get; set; }
 }

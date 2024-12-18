@@ -7,6 +7,7 @@ namespace SCT.Users.DTOs
         public string? Email { get; set; }
         public required string Role { get; set; }
         public int Id { get; set; }
+        public int ProjectId { get; set; }
         public List<string> Tags { get; set; }
     }
 }

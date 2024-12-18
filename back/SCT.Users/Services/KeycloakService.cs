@@ -77,12 +77,14 @@ namespace SCT.Users.Services
                 username = login,
                 email = email,
                 enabled = true,
+                firstName = login,
+                lastName = login,
                 credentials = new[]
                 {
                     new
                     {
                         type = "password",
-                        value = BCrypt.Net.BCrypt.HashPassword(password), 
+                        value = password, 
                         temporary = false
                     }
                 }

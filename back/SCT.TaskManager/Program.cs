@@ -23,10 +23,9 @@ public class Program
                               builder =>
                               {
                                   builder
-                                      .WithOrigins("http://localhost:3000")
+                                      .WithOrigins("*")
                                       .AllowAnyHeader()
-                                      .AllowAnyMethod()
-                                      .AllowCredentials();
+                                      .AllowAnyMethod();
                               });
         });
 

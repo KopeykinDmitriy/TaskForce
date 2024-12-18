@@ -1,34 +1,48 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { fetchTaskById, updateTask, createTask } from '../services/api';
-import '../styles/EditCreateTaskForm.css'
+import { fetchTaskById, updateTask, createTask, getAllTags, getUsers,  } from '../services/api';
+import '../styles/EditCreateTaskForm.css';
 
 const EditCreateTaskForm = () => {
   const defaultTask = {
-    title: "Task's title",
+    name: "Task's title",
     tags: [],
     priority: 'Medium',
-    creator: '',
-    performer: '',
-    date: new Date(),
-    status: '-------',
-    description: `-----`,
+    endDateTime: new Date().toISOString().split('T')[0],
+    status: 'TO_DO',
+    description: '',
+    projectId: 0,
+    creatorName: '',
+    executorName: ''
   };
   const navigate = useNavigate();
 
-  const { taskId } = useParams();
-  const isNew = taskId === 0;
-  console.log(taskId);
+  const { taskId, projectId } = useParams();
+  const isNew = taskId === undefined;
+
   const [task, setTask] = useState(defaultTask);
+  const [allTags, setAllTags] = useState([]);
+  const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    const getTask = async () => {
-      const data = await fetchTaskById(taskId)
-      data.tags = data.tags.join(',');
-      setTask(data)
-    }
-    getTask()
-  }, [taskId])
+    const fetchData = async () => {
+      if (taskId !== undefined) {
+        const data = await fetchTaskById(taskId);
+        data.tags = data.tags.join(',');
+        setTask(data);
+      } else {
+        const data = defaultTask;
+        data.tags = data.tags.join(',');
+        setTask(data);
+      }
+      const tags = await getAllTags();
+      setAllTags(tags);
+
+      const usersData = await getUsers();
+      setUsers(usersData);
+    };
+    fetchData();
+  }, [taskId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -38,31 +52,23 @@ const EditCreateTaskForm = () => {
   const handleSave = async () => {
     const updatedTask = {
       ...task,
-      tags: task.tags.split(','), // Преобразуем строки в массив
-      id: task.id || 0
+      tags: task.tags ? task.tags.split(',') : [],
+      id: task.id || 0,
+      projectId: projectId
     };
-    if (updatedTask.id === 0)
-      await createTask(updatedTask);
-    else
-      await updateTask(updatedTask.id, updatedTask);
+    if (updatedTask.id === 0) await createTask(updatedTask);
+    else await updateTask(updatedTask);
 
-    if (isNew) 
-      navigate('/');
-    else
-      navigate(`/tasks/${task.id}`);
-    
+    if (isNew) navigate(`/${projectId}/`);
+    else navigate(`/${projectId}/tasks/${task.id}`);
   };
 
   const getDate = (dateString) => {
-    if (typeof(dateString) != "string" || dateString.includes('-'))
-      return dateString;
-    console.log(typeof(dateString));
-    console.log(dateString);
+    if (typeof dateString !== 'string' || dateString.includes('-')) return dateString;
     let dateParts = dateString.split('.');
     let date = new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]);
-    console.log(date);
     return date.toISOString().split('T')[0];
-  } 
+  };
 
   return (
     <div className="task-modal">
@@ -70,8 +76,8 @@ const EditCreateTaskForm = () => {
         <h3>{isNew ? 'Create New Task' : 'Edit Task'}</h3>
         <input
           type="text"
-          name="title"
-          value={task.title}
+          name="name"
+          value={task.name}
           onChange={handleChange}
           placeholder="Title"
           className="form-input"
@@ -83,7 +89,13 @@ const EditCreateTaskForm = () => {
           onChange={handleChange}
           placeholder="Tags (comma-separated)"
           className="form-input"
+          list="tags-list"
         />
+        <datalist id="tags-list">
+          {allTags.map((tag) => (
+            <option key={tag} value={tag} />
+          ))}
+        </datalist>
         <select
           name="priority"
           value={task.priority}
@@ -94,7 +106,7 @@ const EditCreateTaskForm = () => {
           <option value="high">High</option>
           <option value="medium">Medium</option>
           <option value="low">Low</option>
-          <option value="very Low">Very Low</option>
+          <option value="very low">Very Low</option>
         </select>
         <textarea
           name="description"
@@ -103,30 +115,36 @@ const EditCreateTaskForm = () => {
           placeholder="Description"
           className="form-input textarea"
         />
-        <input
-          type="text"
-          name="author"
-          value={task.author}
+        <select
+          name="executorName"
+          value={task.executorName}
           onChange={handleChange}
-          placeholder="Author"
           className="form-input"
-        />
+        >
+          <option value="">Select Executor</option>
+          {users.map((user) => (
+            <option key={user.id} value={user.name}>
+              {user.name}
+            </option>
+          ))}
+        </select>
         <input
           type="date"
-          name="date"
-          value={getDate(task.date)}
+          name="endDateTime"
+          value={getDate(task.endDateTime)}
           onChange={handleChange}
           className="form-input"
         />
         <div className="actions">
-          <Link class="link-without" to={isNew ? `/` : `/tasks/${task.id}` }>
-            <button className="cancel-btn">
-              Cancel
-            </button>
+          <Link
+            className="link-without"
+            to={isNew ? `/${projectId}/` : `/${projectId}/tasks/${task.id}`}
+          >
+            <button className="cancel-btn">Cancel</button>
           </Link>
-            <button className="save-btn" onClick={handleSave}>
-                {isNew ? 'Create' : 'Save'}
-            </button>
+          <button className="save-btn" onClick={handleSave}>
+            {isNew ? 'Create' : 'Save'}
+          </button>
         </div>
       </div>
     </div>

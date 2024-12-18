@@ -1,21 +1,23 @@
 import React, { useEffect, useState } from "react";
-import { fetchTaskById } from '../services/api';
+import { fetchTaskById, updateTask } from '../services/api';
 import { useParams, Link } from 'react-router-dom';
 import '../styles/TaskDetails.css'
 
 function TaskDetails() {
   const defaultTask = {
-    title: "Task's title",
-    tags: ["loading", "loading", "loading"],
-    priority: "----",
-    author: "-------",
-    performer: "-----",
-    date: "------",
-    status: "-------",
-    description: "-----",
+    name: "Task's title",
+    tags: [],
+    priority: 'Medium',
+    endDateTime: '',
+    startDateTime: '',
+    status: 'TO_DO',
+    description: ``,
+    projectId: 0,
+    creatorName: '',
+    executorName: ''
   };
 
-  const { taskId } = useParams();
+  const { projectId, taskId } = useParams();
   const [task, setTask] = useState(defaultTask);
   let isInitialized = false;
 
@@ -35,25 +37,37 @@ function TaskDetails() {
   }, [isInitialized]);
 
   const getFirstButtonName = () => {
-    if (task.status === 'to_do')
-      return "in_progress";
-    return 'to_do';
+    if (task.status === 'TO_DO')
+      return "IN_PROGRESS";
+    return 'TO_DO';
   }
 
   const getSecondButtonName = () => {
-    if (task.status === 'done')
-      return 'in_progress';
-    return 'done';
+    if (task.status === 'DONE')
+      return 'IN_PROGRESS';
+    return 'DONE';
+  }
+
+  const onClickFirstButton = async () => {
+    task.status = getFirstButtonName();
+    await updateTask(task);
+    setTask((prevTask) => ({ ...prevTask, status: task.status }));
+  }
+
+  const onClickSecondButton = async () => {
+    task.status = getSecondButtonName();
+    await updateTask(task);
+    setTask((prevTask) => ({ ...prevTask, status: task.status }));
   }
 
   return (
     <div className="task-modal">
       <div className="task-modal-content">
         <div className="content-modal-header">
-        <h2>{task.title}</h2>
+        <h2>{task.name}</h2>
         <div className="navigation-buttons">
-          <button className="nav-btn">{getFirstButtonName()}</button>
-          <button className="nav-btn">{getSecondButtonName()}</button>
+          <button className="nav-btn" onClick={onClickFirstButton}>{getFirstButtonName()}</button>
+          <button className="nav-btn" onClick={onClickSecondButton}>{getSecondButtonName()}</button>
         </div>
         </div>
         <div className="tags">
@@ -70,12 +84,15 @@ function TaskDetails() {
   
         <div className="info">
           <div className="info-column">
-            <p><strong>Creator:</strong> {task.author}</p>
-            <p><strong>Performer:</strong> {task.performer}</p>
+            <p><strong>Creator:</strong> {task.creatorName}</p>
+            <p><strong>Performer:</strong> {task.executorName}</p>
           </div>
           <div className="info-column">
-            <p><strong>Date:</strong> {task.date}</p>
+            <p><strong>StartDate:</strong> {task.startDateTime.slice(0, 10)}</p>
             <p><strong>Status:</strong> {task.status}</p>
+          </div>
+          <div className="info-column">
+            <p><strong>EndDate:</strong> {task.endDateTime.slice(0, 10)}</p>
           </div>
         </div>
   
@@ -86,12 +103,12 @@ function TaskDetails() {
         />
   
         <div className="actions">
-          <Link className="link-without" to="/">
+          <Link className="link-without" to={`/${projectId}`}>
             <button className="cancel-btn">
               Cancel
             </button>
           </Link>
-          <Link className="link-without" to={`/tasks/${task.id}/edit`}>
+          <Link className="link-without" to={`/${projectId}/tasks/${task.id}/edit`}>
             <button className="edit-btn">
               Edit
             </button>

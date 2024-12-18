@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SCT.Common.Data.DatabaseContext;
+using SCT.Users.Providers;
 using SCT.Users.Repositories;
 using SCT.Users.Services;
 
@@ -22,10 +23,9 @@ public class Program
                               builder =>
                               {
                                   builder
-                                      .WithOrigins("http://localhost:3000")
+                                      .WithOrigins("*")
                                       .AllowAnyHeader()
-                                      .AllowAnyMethod() 
-                                      .AllowCredentials();
+                                      .AllowAnyMethod();
                               });
         });
 
@@ -41,6 +41,7 @@ public class Program
         builder.Services.AddSingleton<UserRepository>(); 
         builder.Services.AddSingleton<UserService>();    
         builder.Services.AddSingleton<KeycloakService>();
+        builder.Services.AddSingleton<IUsernameProvider, UsernameProvider>();
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddHttpClient();                
         builder.Services.AddControllers(options =>
