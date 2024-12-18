@@ -1,0 +1,12 @@
+.kanban-status {
+    background-color: grey;
+    color: white;
+    height: 70px;
+    padding-top: 15px;
+    font-weight: bold;
+  }
+
+.card-body-hover:hover {
+background-color: #f0f0f0; /* Светло-серый цвет для эффекта наведения */
+transition: background-color 0.3s ease; /* Плавный переход */
+}

@@ -33,7 +33,6 @@ public class ProjectsController : Controller
     [HttpPost("UpdateProject")]
     public async Task<IActionResult> UpdateAsync(ProjectDto updatedProject)
     {
-        // Обновляем задачу
         await _projectsRepository.UpdateAsync(updatedProject);
 
         return Ok(new { message = "Project updated successfully" });

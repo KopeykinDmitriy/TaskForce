@@ -1,0 +1,84 @@
+body {
+  background-color: #a11414; /* Светло-серый фон */
+  margin: 0;
+  padding: 0;
+  font-family: "Roboto Mono";
+  height: '100%';
+  width: '100%';
+  background-size: cover;
+}
+
+.base-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 70vh;
+  min-height: 100%; 
+}
+
+.base-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #f4f4f4;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 600px;
+  height: 320px;
+}
+
+.base-title {
+  font-size: 28px;
+  font-weight: bold;
+  color: #ff6600;
+  margin-bottom: 20px;
+}
+
+.base-form {
+  margin: auto;
+  width: 70%;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.input-group label {
+  padding: 0.5rem;
+  background-color: #f4f4f4;
+  border-right: 1px solid #ccc;
+}
+
+.input-group input {
+  flex: 1;
+  padding: 0.5rem;
+  border: none;
+  outline: none;
+}
+
+.btn-submit {
+  background-color: #0056b3;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 20px;
+}
+
+.btn-submit:hover {
+  background-color: #004494;
+}
+
+.link-without {
+  text-decoration: none;
+  color:#2c3e50;
+}

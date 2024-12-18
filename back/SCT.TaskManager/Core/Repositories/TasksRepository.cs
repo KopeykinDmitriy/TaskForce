@@ -24,11 +24,18 @@ public class TasksRepository : ITasksRepository
     {
         await InitializeAsync();
         var userName = _usernameProvider.Get();
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.name == userName);
-        var taskEntity = task.MapToEntity(user.id);
+        var userCreator = await _context.Users.FirstOrDefaultAsync(u => u.name == userName);
+        var userExecutor = string.Equals(task.ExecutorName, string.Empty) 
+                               ? null 
+                               : await _context.Users.FirstOrDefaultAsync(u => u.name == task.ExecutorName);
+        var taskEntity = task.MapToEntity(userCreator.id, userExecutor?.id);
         taskEntity.TaskTags = await GetTaskTagsAsync(task);
-        await _context.Tasks.AddAsync(taskEntity);
+        taskEntity.UserCreateId = userCreator.id;
+        var newTask = await _context.Tasks.AddAsync(taskEntity);
         await _context.SaveChangesAsync();
+        task.Id = newTask.Entity.Id;
+        task.CreatorName = newTask.Entity.UserCreate.name;
+        task.ExecutorName = newTask.Entity.UserDo?.name ?? string.Empty;
         _tasks.Add(task);
     }
     
@@ -44,17 +51,15 @@ public class TasksRepository : ITasksRepository
     {
         await InitializeAsync();
 
-        // Находим отслеживаемую задачу в контексте
         var existingTask = await _context.Tasks
-            .Include(t => t.TaskTags) // Загружаем связанные TaskTags
+            .Include(t => t.TaskTags)
             .FirstOrDefaultAsync(t => t.Id == updatedTask.Id);
 
         if (existingTask == null)
             throw new InvalidOperationException("Task not found");
         
-        var updatedTaskEntity = updatedTask.MapToEntity(existingTask.UserCreateId);
+        var updatedTaskEntity = updatedTask.MapToEntity(existingTask.UserCreateId, existingTask.UserDoId);
 
-        // Обновляем поля сущности
         existingTask.Name = updatedTaskEntity.Name;
         existingTask.Description = updatedTaskEntity.Description;
         existingTask.Start_dt = updatedTaskEntity.Start_dt;
@@ -62,14 +67,11 @@ public class TasksRepository : ITasksRepository
         existingTask.Status = updatedTaskEntity.Status;
         existingTask.Priority = updatedTaskEntity.Priority;
 
-        // Обновляем связанные теги
         var newTaskTags = await GetTaskTagsAsync(updatedTask);
         existingTask.TaskTags = newTaskTags;
 
-        // Сохраняем изменения
         await _context.SaveChangesAsync();
 
-        // Обновляем кэш задач
         var taskIndex = _tasks.FindIndex(t => t.Id == updatedTask.Id);
         _tasks[taskIndex] = updatedTask;
     }
@@ -87,7 +89,7 @@ public class TasksRepository : ITasksRepository
         if (_tasks.Any())
             return;
 
-        var tasks = await _context.Tasks.Include(t => t.TaskTags).ThenInclude(tt => tt.Tag).ToListAsync();
+        var tasks = await _context.Tasks.Include(t => t.TaskTags).ThenInclude(tt => tt.Tag).Include(t => t.UserCreate).Include(t => t.UserDo).ToListAsync();
         var taskDtos = tasks.Select(t => t.MapToDto()).ToList();
         _tasks = taskDtos;
     }
@@ -114,7 +116,10 @@ public class TasksRepository : ITasksRepository
 
     private async Task<List<TaskDto>> GetAvailableTasksAsync(List<TaskDto> tasks)
     {
-        var user = await _context.Users.Include(u => u.UserTags).ThenInclude(ut => ut.Tag).FirstOrDefaultAsync(u => u.name == _usernameProvider.Get());
+        var user = await _context.Users.Include(u => u.UserTags).ThenInclude(ut => ut.Tag).FirstOrDefaultAsync(u => string.Equals(u.name.ToLower(), _usernameProvider.Get().ToLower()));
+        if (user.role == "admin")
+            return tasks;
+        
         var availableTasks = tasks.Where(t => t.Tags.Any(tag => user.UserTags.Select(ut => ut.Tag.Name.ToLower()).Contains(tag.ToLower())));
         return availableTasks.ToList();
     }

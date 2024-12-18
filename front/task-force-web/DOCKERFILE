@@ -1,0 +1,28 @@
+# Dockerfile для React-приложения
+
+# Шаг 1: Используем официальный образ Node.js
+FROM node:18 AS build
+
+# Устанавливаем рабочую директорию внутри контейнера
+WORKDIR /app
+
+# Копируем package.json и устанавливаем зависимости
+COPY package.json ./
+COPY package-lock.json ./
+RUN npm install
+
+# Копируем весь проект и строим его
+COPY . ./
+RUN npm run build
+
+# Шаг 2: Сервер для статики на основе NGINX
+FROM nginx:alpine
+
+# Копируем build директорию из первого этапа в директорию nginx
+COPY --from=build /app/build /usr/share/nginx/html
+
+# Открываем порт 80 для NGINX
+EXPOSE 80
+
+# Запускаем NGINX
+CMD ["nginx", "-g", "daemon off;"]

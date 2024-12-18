@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SCT.Users.DTOs;
 using SCT.Users.Services;
-using SCT.Users.Repositories;
 
 namespace SCT.Users.Controllers;
 
@@ -25,16 +24,20 @@ public class DataController : ControllerBase
         return Ok(users);
     }
 
+    [HttpGet("users-by-project")]
+    public async Task<IActionResult> GetAllUserByProject(int projectId)
+    {
+        var users = await _userService.GetAllUsersByProjectAsync(projectId);
+        return Ok(users);
+    }
 
     [HttpPost("users")]
     public async Task<IActionResult> AddUser(UserDto userDto)
     {
-        var user = await _userService.AddUserAsync(userDto);
-        return CreatedAtAction(nameof(GetAllUsers), new { id = user.id }, user);
+        await _userService.AddUserAsync(userDto);
+        return Ok();
     }
 
-    [AllowAnonymous]
-    [Authorize]
     [HttpPost("AddTagToUser")]
     public async Task<IActionResult> AddTagToUser([FromBody] List<TagDto> requests)
     {
@@ -57,5 +60,11 @@ public class DataController : ControllerBase
             var innerException = ex.InnerException?.Message ?? "No inner exception.";
             return StatusCode(500, $"Error adding tag to user: {ex.Message}. Inner exception: {innerException}");
         }
+    }
+
+    [HttpGet("UserInfo")]
+    public async Task<UserDto> GetUserInfoAsync()
+    {
+        return await _userService.GetUserInfo();
     }
 }

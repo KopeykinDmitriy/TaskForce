@@ -2,10 +2,7 @@
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using BCrypt.Net;
 using System.Text.Json.Serialization;
-
-
 
 namespace SCT.Users.Services
 {
@@ -80,12 +77,14 @@ namespace SCT.Users.Services
                 username = login,
                 email = email,
                 enabled = true,
+                firstName = login,
+                lastName = login,
                 credentials = new[]
                 {
                     new
                     {
                         type = "password",
-                        value = BCrypt.Net.BCrypt.HashPassword(password), // Хэширование, для получения использовать: BCrypt.Net.BCrypt.Verify(password, hashedPassword)
+                        value = password, 
                         temporary = false
                     }
                 }
