@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using OfficeOpenXml;
 using SCT.Common.Data.DatabaseContext;
 using SCT.TaskManager.Core.Interfaces.Repositories;
 using SCT.TaskManager.Core.Providers;
@@ -15,6 +16,10 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+
+        // Устанавливаем контекст лицензии EPPlus перед использованием
+        ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
         builder.Configuration.AddEnvironmentVariables();
         
         builder.Services.AddCors(options =>
