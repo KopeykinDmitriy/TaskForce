@@ -13,13 +13,17 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
       - KK_PORT=${KK_AUTHORITY_PORT}
       - KK_AUDIENCE=${KK_AUDIENCE}
-    ports:
-      - "5001:8080"
     networks:
       - mynetwork
     depends_on:
       postgres:
         condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
 
   sct.users:
     container_name: sct.users
@@ -38,6 +42,12 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
 
   keycloak:
     image: quay.io/keycloak/keycloak:latest
@@ -55,15 +65,21 @@ services:
       - KC_DB_PASSWORD=${DB_PASSWORD}
       - KEYCLOAK_FRONTEND_URL=*
       - KEYCLOAK_CORS=true
-    ports:
-      - "8080:8080"
     depends_on:
       postgres:
         condition: service_healthy
+    ports:
+      - "7985:8080"
     volumes:
       - ./kk_data:/opt/keycloak/data
     networks:
       - mynetwork
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
 
   postgres:
     image: postgres:latest
@@ -117,20 +133,48 @@ services:
       - keycloak
     networks:
       - mynetwork
-  
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
+
   react-app:
     container_name: react-app
     build:
-      context: ./front/task-force-web  # Путь к папке с вашим React приложением
-      dockerfile: DOCKERFILE  # Укажите путь к вашему Dockerfile, если он в другой папке
-    ports:
-      - "3001:80"  # Прокси-сервер для статики React-приложения будет работать на порту 80 внутри контейнера
+      context: ./front/task-force-web
+      dockerfile: DOCKERFILE
     networks:
       - mynetwork
     depends_on:
       - keycloak
-      - sct.task-manager  # Если ваш фронтенд зависит от этих сервисов
+      - sct.task-manager
       - sct.users
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  task-predictor:
+    container_name: task-predictor
+    build:
+      context: ./task-predictor
+      dockerfile: DOCKERFILE
+    networks:
+      - mynetwork
+    ports:
+      - "5000:5000"
+    depends_on:
+      - sct.task-manager
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 256M
 
 networks:
   mynetwork:

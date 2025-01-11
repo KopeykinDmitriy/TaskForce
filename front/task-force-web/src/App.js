@@ -11,6 +11,7 @@ import MainPage from './components/MainPage';
 import CreateNewProjectModal from './components/CreateNewProjectModal';
 import EditCreateTaskForm from './components/EditCreateTaskForm';
 import UserManagementPage from './components/UserManagementPage';
+import TrainModelPage from './components/TrainModelPage';
 
 
 const App = () => {
@@ -35,6 +36,9 @@ const App = () => {
             } />
             <Route path="/:projectId/settings/users" element={
               <PrivateRoute><UserManagementPage /></PrivateRoute>
+            } />
+            <Route path="/:projectId/train" element={
+              <PrivateRoute><TrainModelPage /></PrivateRoute>
             } />
           </Route>
           <Route path="/projects" element={

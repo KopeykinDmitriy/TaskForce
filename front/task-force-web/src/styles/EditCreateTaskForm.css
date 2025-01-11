@@ -62,3 +62,23 @@
   .save-btn:hover {
     background:rgb(57, 57, 255)
   }
+
+  .date-predict-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .predict-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 4px; 
+  }
+  
+  .predict-btn:hover {
+    background-color: #0056b3;
+  }
+  

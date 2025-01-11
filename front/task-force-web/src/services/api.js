@@ -86,3 +86,47 @@ export const getUserInfo = async () => {
   const response = await axiosInstance.get('/users/api/Data/UserInfo');
   return response.data;
 }
+
+export const predict = async (taskData) => {
+  const axiosInstance = getAxiosInstance();
+  const response = await axiosInstance.post('/predictor/predict', taskData);
+  return response.data;
+}
+
+export const train = async (file) => {
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await axios.post('/predictor/train', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      `Ошибка обучения модели: ${error.response?.statusText || error.message}`
+    );
+  }
+};
+
+export const fetchTasksData = async (projectId) => {
+  try {
+    const response = await axios.get(
+      `http://localhost/task-manager/Tasks/Export/${projectId}`,
+      {
+        responseType: 'blob',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      `Ошибка загрузки Excel-файла: ${error.response?.statusText || error.message}`
+    );
+  }
+};
