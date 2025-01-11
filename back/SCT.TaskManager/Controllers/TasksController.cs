@@ -1,7 +1,10 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SCT.Common.Data.DatabaseContext;
 using SCT.TaskManager.Core.Interfaces.Repositories;
+using SCT.TaskManager.Core.Repositories;
+using SCT.TaskManager.Core.Services;
 using SCT.TaskManager.DTO;
 
 namespace SCT.TaskManager.Controllers;
@@ -53,6 +56,22 @@ public class TasksController : ControllerBase
     public async Task<List<string>> GetAllTagsAsync()
     {
         return await _context.Tags.Select(t => t.Name).ToListAsync();
+    }
+
+    [HttpGet("Export/{projectId}")]
+    public async Task<IActionResult> ExportProjectTasks(int projectId)
+    {
+        try
+        {
+            var exporter = new ExportTasksToExcel();
+            var excelStream = await exporter.ExportProjectTasksAsync(_tasksRepository, projectId);
+
+            return File(excelStream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "ProjectTasks.xlsx");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 }
 
