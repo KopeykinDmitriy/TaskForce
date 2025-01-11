@@ -15,6 +15,7 @@ const Sidebar = () => {
         <button class="sidebar-btn" type="button"><Link class='link-without' to={`/${projectId}/tasks/create`}>New Task</Link></button>
       </div>
       <div class="sidebar-bot">
+        <button class="sidebar-btn" type="button"><Link class='link-without' to={`/${projectId}/train`}>Train</Link></button>
         <button class="sidebar-btn" type="button"><Link class='link-without' to={`/${projectId}/settings/users`}>Users</Link></button>
         <button class="sidebar-btn" type="button"><Link class='link-without' to="/logout">Logout</Link></button>
       </div>

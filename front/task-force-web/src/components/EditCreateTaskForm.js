@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { fetchTaskById, updateTask, createTask, getAllTags, getUsers,  } from '../services/api';
+import { fetchTaskById, updateTask, createTask, getAllTags, getUsers, predict } from '../services/api';
 import '../styles/EditCreateTaskForm.css';
 
 const EditCreateTaskForm = () => {
@@ -70,6 +70,22 @@ const EditCreateTaskForm = () => {
     return date.toISOString().split('T')[0];
   };
 
+  const handlePredictDate = async () => {
+      const taskData = {
+        task_name: task.name, 
+        description: task.description, 
+        tags: task.tags
+      }
+      const predictResult = await predict(taskData);
+      const predictedDate = new Date();
+      predictedDate.setDate(predictedDate.getDate() + predictResult.predicted_days);
+      setTask({
+        ...task,
+        endDateTime: predictedDate.toISOString().split("T")[0],
+      });
+    
+  };
+
   return (
     <div className="task-modal">
       <div className="form-content">
@@ -128,13 +144,18 @@ const EditCreateTaskForm = () => {
             </option>
           ))}
         </select>
-        <input
-          type="date"
-          name="endDateTime"
-          value={getDate(task.endDateTime)}
-          onChange={handleChange}
-          className="form-input"
-        />
+        <div className="date-predict-container">
+          <input
+            type="date"
+            name="endDateTime"
+            value={getDate(task.endDateTime)}
+            onChange={handleChange}
+            className="form-input"
+          />
+          <button onClick={handlePredictDate} className="predict-btn">
+            Predict
+          </button>
+        </div>
         <div className="actions">
           <Link
             className="link-without"
