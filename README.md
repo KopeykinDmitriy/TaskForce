@@ -1,4 +1,4 @@
-# TaskForce
+# Smart Collaboration Tools
 
 - В папке back содержится 2 сервиса sct.users и sct.task-manager.
 - В папке front содержится проект на react
