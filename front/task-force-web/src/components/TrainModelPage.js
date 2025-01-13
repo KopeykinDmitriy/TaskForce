@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
-import { fetchTasksData, train } from "../services/api";
+import { fetchTasksData, train, checkStatus } from "../services/api";
 
 const TrainModelPage = () => {
   const { projectId } = useParams();
@@ -16,9 +16,21 @@ const TrainModelPage = () => {
     try {
       const tasksData = await fetchTasksData(projectId);
 
-      await train(tasksData);
-
-      alert('Модель успешно обучена!');
+      const response = await train(tasksData);
+      const taskId = response.task_id;
+        
+      let status = await checkStatus(taskId);
+      while (status.status === "running") {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        status = await checkStatus(taskId);
+      }
+    
+      if (status.status === "completed") {
+        alert('Модель успешно обучена!');
+      }
+      else {
+        setError(status.result || "Произошла ошибка.");
+      }
     } catch (err) {
       setError(err.message || "Произошла ошибка.");
     } finally {

@@ -130,3 +130,9 @@ export const fetchTasksData = async (projectId) => {
     );
   }
 };
+
+export const checkStatus = async (taskId) => {
+  const axiosInstance = getAxiosInstance();
+  const response = await axiosInstance.get(`/predictor/status/${taskId}`);
+  return response.data;
+};
