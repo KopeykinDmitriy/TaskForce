@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { fetchTaskById, updateTask, createTask, getAllTags, getUsers, predict } from '../services/api';
+import { fetchTaskById, updateTask, createTask, getAllTags, getUsers, predict, checkStatus } from '../services/api';
 import '../styles/EditCreateTaskForm.css';
 
 const EditCreateTaskForm = () => {
@@ -70,20 +70,33 @@ const EditCreateTaskForm = () => {
     return date.toISOString().split('T')[0];
   };
 
+  
+  
   const handlePredictDate = async () => {
-      const taskData = {
-        task_name: task.name, 
-        description: task.description, 
-        tags: task.tags
-      }
-      const predictResult = await predict(taskData);
+    const taskData = {
+      task_name: task.name,
+      description: task.description,
+      tags: task.tags,
+    };
+    const response = await predict(taskData);
+    const taskId = response.task_id;
+  
+    let status = await checkStatus(taskId);
+    while (status.status === "running") {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      status = await checkStatus(taskId);
+    }
+  
+    if (status.status === "completed") {
       const predictedDate = new Date();
-      predictedDate.setDate(predictedDate.getDate() + predictResult.predicted_days);
+      predictedDate.setDate(predictedDate.getDate() + status.result.predicted_days);
       setTask({
         ...task,
         endDateTime: predictedDate.toISOString().split("T")[0],
       });
-    
+    } else {
+      alert("Ошибка при предсказании даты: " + status.result);
+    }
   };
 
   return (
